@@ -2,3 +2,23 @@
 *.swp
 *.swn
 *.swo
+# ========== 新增忽略规则 ==========
+# 忽略 Django Admin 自带的静态文件（第三方库，无需提交）
+/static/admin/
+
+# 忽略压缩后的 JS/CSS 产物（只提交源码，不提交编译后的文件）
+/static/js/dist/
+/static/css/dist/
+*.min.js
+*.min.css
+
+# 忽略数据库文件（避免提交动态变化的数据库）
+db.sqlite3
+db.sqlite3-journal
+
+# 忽略 IDE 配置文件（如 PyCharm 的 .idea）
+.idea/
+
+# 忽略 Python 缓存文件
+__pycache__/
+*.pyc
