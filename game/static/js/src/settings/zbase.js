@@ -1,11 +1,11 @@
-class Settings{
-    constructor(root){
+class Settings {
+    constructor(root) {
         this.root = root;
         this.platform = "WEB";
         if (this.root.AcWingOS) this.platform = "ACAPP"
         this.username = "";
-        this.photo="";
-        
+        this.photo = "";
+
         this.$settings = $(`
 <div class="ac-game-settings">
     <div class="ac-game-settings-login">
@@ -80,7 +80,7 @@ class Settings{
              </div>
     </div>
 </div>
-`);     
+`);
 
         this.$login = this.$settings.find(".ac-game-settings-login");
         this.$login_username = this.$login.find(".ac-game-settings-username input");
@@ -108,52 +108,51 @@ class Settings{
         this.start();
     }
 
-    start(){
-        if (this.platform === "ACAPP"){
+    start() {
+        if (this.platform === "ACAPP") {
             this.getinfo_acapp();
-        }else{
-        this.getinfo();
-        this.add_listening_events();
+        } else {
+            this.getinfo();
+            this.add_listening_events();
         }
     }
-    
+
     add_listening_events() {
         let outer = this;
         this.add_listening_events_login();
         this.add_listening_events_register();
 
-        this.$acwing_login.click(function(){
+        this.$acwing_login.click(function () {
             outer.acwing_login();
         });
     }
-    
-    add_listening_events_login(){
+
+    add_listening_events_login() {
         let outer = this;
-        this.$login_register.click(function(){
+        this.$login_register.click(function () {
             outer.register();
         });
-        this.$login_submit.click(function(){
+        this.$login_submit.click(function () {
             outer.login_on_remote();
         });
     }
 
-    add_listening_events_register(){
+    add_listening_events_register() {
         let outer = this;
-        this.$register_login.click(function(){
+        this.$register_login.click(function () {
             outer.login();
         });
-        this.$register_submit.click(function(){
-             outer.register_on_remote();
+        this.$register_submit.click(function () {
+            outer.register_on_remote();
         });
     }
-    
-    acwing_login(){
+
+    acwing_login() {
         $.ajax({
             url: "https://app7741.acapp.acwing.com.cn/settings/acwing/web/apply_code/",
             type: "GET",
-            success:function(resp){
-                console.log(resp);
-                if (resp.result === "success"){
+            success: function (resp) {
+                if (resp.result === "success") {
                     window.location.replace(resp.apply_code_url);
                 }
             }
@@ -167,25 +166,24 @@ class Settings{
         this.$login_error_message.empty();
 
         $.ajax({
-            url:"https://app7741.acapp.acwing.com.cn/settings/login/",
-            type:"GET",
-            data:{
-                username:username,
-                password:password,
+            url: "https://app7741.acapp.acwing.com.cn/settings/login/",
+            type: "GET",
+            data: {
+                username: username,
+                password: password,
             },
-            success:function(resp){
-                console.log(resp);
-                if (resp.result === "success"){
+            success: function (resp) {
+                if (resp.result === "success") {
                     location.reload();
-                }else {
+                } else {
                     outer.$login_error_message.html(resp.result);
                 }
             }
 
         });
     }
-    
-    register_on_remote(){ // 在远程服务器上注册
+
+    register_on_remote() { // 在远程服务器上注册
         let outer = this;
         let username = this.$register_username.val();
         let password = this.$register_password.val();
@@ -193,38 +191,37 @@ class Settings{
         this.$register_error_message.empty();
 
         $.ajax({
-            url:"https://app7741.acapp.acwing.com.cn/settings/register/",
-            type:"GET",
-            data:{
+            url: "https://app7741.acapp.acwing.com.cn/settings/register/",
+            type: "GET",
+            data: {
                 username: username,
                 password: password,
-                password_confirm:password_confirm,
+                password_confirm: password_confirm,
             },
-            success:function(resp){
-                console.log(resp);
-                if (resp.result === "success"){
+            success: function (resp) {
+                if (resp.result === "success") {
                     location.reload();  //刷新页面
-                }else{
+                } else {
                     outer.$register_error_message.html(resp.result);
                 }
             }
         });
     }
 
-    logout_on_remote(){ // 在远程服务器上登出
-        if (this.platform ==="ACAPP") return false;
-
-        $.ajax({
-            url:"https://app7741.acapp.acwing.com.cn/settings/logout/",
-            type:"GET",
-            success: function(resp){
-                console.log(resp);
-                if (resp.result === "success"){
-                    location.reload();
+    logout_on_remote() { // 在远程服务器上登出
+        if (this.platform === "ACAPP") {
+            this.root.AcWingOS.api.window.close();
+        } else {
+            $.ajax({
+                url: "https://app7741.acapp.acwing.com.cn/settings/logout/",
+                type: "GET",
+                success: function (resp) {
+                    if (resp.result === "success") {
+                        location.reload();
+                    }
                 }
-            }
-        });
-
+            });
+        }
     }
 
     register(){ //打开注册界面
@@ -241,9 +238,7 @@ class Settings{
         let outer = this;
 
         this.root.AcWingOS.api.oauth2.authorize(appid, redirect_uri, scope, state, function(resp){
-           
-            console.log("called from acapp_login function");
-            console.log(resp);
+
             if (resp.result === "success"){
                 outer.username = resp.username;
                 outer.photo = resp.photo;
