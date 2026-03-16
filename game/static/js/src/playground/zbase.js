@@ -41,6 +41,9 @@ class AcGamePlayground {
         this.game_map = new GameMap(this);
 
         this.mode = mode;
+        this.start = "waiting";  //waiting -> fighting -> over
+        this.notice_board = new NoticeBord(this);
+        this.player_count = 0;
 
         this.resize();
 
