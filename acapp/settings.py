@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
-from datetime import timedelta  # 对齐老师版本：新增 JWT 依赖
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,21 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# 保留你的 SECRET_KEY
 SECRET_KEY = 'django-insecure-z%(wl!8fmwmg*yttt$_eewa9#p2hx!ie2emtgw%)_%-zyka!3i'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# 保留你的 ALLOWED_HOSTS
 ALLOWED_HOSTS = ["47.109.110.119", "app7741.acapp.acwing.com.cn"]
 
 
 # Application definition
-# 严格对齐老师的 INSTALLED_APPS 顺序和内容
 INSTALLED_APPS = [
-    'rest_framework_simplejwt',  # 对齐老师版本：新增
-    'rest_framework',            # 对齐老师版本：新增
+    'rest_framework_simplejwt',
+    'rest_framework',
     'channels',
     'game.apps.GameConfig',
     'django.contrib.admin',
@@ -46,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-# 严格对齐老师的 MIDDLEWARE（无新增）
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -56,6 +53,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
 
 ROOT_URLCONF = 'acapp.urls'
 
@@ -87,7 +86,6 @@ DATABASES = {
     }
 }
 
-# 对齐老师的 CACHES 格式（仅调整缩进，内容不变）
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -116,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# 对齐老师版本：新增 REST_FRAMEWORK 和 SIMPLE_JWT 完整配置
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.IsAuthenticated',

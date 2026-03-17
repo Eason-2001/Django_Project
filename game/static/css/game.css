@@ -1,31 +1,24 @@
-.ac-game {
-    width: 100% !important;
-    height: 100% !important;
-    position: relative;
-    overflow: hidden;
-}
-
 .ac-game-settings {
-    width:100%;
-    height:100% !important;
-    background-image:url("/static/image/menu/wangfeng.gif");
-    background-size: cover;
-    background-position: center;
+    width: 100%;
+    height: 100%;
+    background-image: url("/static/image/menu/background.gif");
+    background-size: 100% 100%;
     user-select: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-.ac-game-settings-login{
-    height: min(41vh, 400px);
-    width: min(20vw, 350px);
-    min-width: 280px;
-    background-color:rgba(0,0,0,0.7);
-    border-radius: 20px;
+.ac-game-settings-login {
+    height: 41vh;
+    width: 20vw;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
 }
 
-.ac-game-settings-title{
+
+.ac-game-settings-title {
     color: white;
     font-size: 3vh;
     text-align: center;
@@ -38,18 +31,13 @@
     height: 7vh;
 }
 
-.ac-game-settings-item {
-    width: 100%;
-    height: 7vh;
-}
-
 .ac-game-settings-password {
-    display:block;
+    display: block;
     height: 7vh;
 }
 
 .ac-game-settings-submit {
-    display:block;
+    display: block;
     height: 7vh;
 }
 
@@ -58,8 +46,13 @@
     height: 7vh;
 }
 
-.ac-game-settings-item > input{
-    width:90%;
+.ac-game-settings-item {
+    width: 100%;
+    height: 100%;
+}
+
+.ac-game-settings-item > input {
+    width: 90%;
     line-height: 3vh;
     position: relative;
     top: 50%;
@@ -67,30 +60,29 @@
     transform: translate(-50%, -50%);
 }
 
-.ac-game-settings-item > button{
+.ac-game-settings-item > button {
     color: white;
-    width:90%;
+    width: 90%;
     line-height: 3vh;
     position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #B0120A;
-    border-radius: 20px;
+    background-color: #4CAF50;
+    border-radius: 5px;
 }
 
-.ac-game-settings-error-message{
-    color:white;
-    font-size:1.5vh;
+.ac-game-settings-error-message {
+    color: red;
+    font-size: 0.8vh;
     display: inline;
     float: left;
-    padding-left:1.3vw;
-    cursor:pointer;
+    padding-left: 1vw;
 }
 
 .ac-game-settings-option {
-    color:white;
-    font-size: 1.5vh;
+    color: white;
+    font-size: 2vh;
     display: inline;
     float: right;
     padding-right: 1vw;
@@ -98,7 +90,7 @@
 }
 
 .ac-game-settings-acwing > img {
-    position:relative;
+    position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -107,91 +99,85 @@
 }
 
 .ac-game-settings-acwing > div {
-    color:white;
-    font-size: 1.5vh;
-    text-align:center;
-    display: block;
-}
-
-
-.ac-game-settings-register{
-    height: min(49vh, 480px);
-    width: min(20vw, 350px);
-    min-width: 280px;
-    background-color:rgba(0,0,0,0.7);
-    border-radius: 20px;
-}
-
-
-.ac-game-menu{
-    width:100%;
-    height:100% !important;
-    background-image:url("/static/image/menu/wangfeng.gif");
-    background-size: 100% 100%;
-    background-position: center;
-    user-select: none;
-    position: relative;
-}
-
-
-.ac-game-menu-field{
-    width: min(20vw, 400px);
-    min-width: 250px;
-    position: absolute;
-    top: 50%;
-    left: 20%;
-    transform: translateY(-50%);
-    overflow: visible !important;
-}
-
-.ac-game-menu-field-item{
     color: white;
-    height: min(7vh, 80px);
-    width: min(15vw, 300px);
-    min-width: 200px;
-    font-size: clamp(24px, 6vh, 48px);
-    font-style: italic;
-    padding: 3vh;
-    border-radius:10px;
+    font-size: 1.5vh;
+    text-align: center;
     display: block;
-    letter-spacing: clamp(2px, 0.5vw, 8px);
-    cursor: pointer;
-    transition: transform 0.3s ease !important;
-    transform-origin: center center !important;
-    margin-bottom: 2vh;
-    white-space: nowrap;
-    box-sizing: border-box;
 }
 
-.ac-game-menu-field-item:hover {
-    transform: scale(1.2) !important;
-}
-
-/* 游戏画布 - 保留原有样式 */
-.ac-game-playground {
-    width: 100%;
-    height: 100%;
-    user-select:none;
-    background-color: gray;
-}
-
-.ac-game-playground > canvas{
+.ac-game-settings-register {
+    height: 49vh;
+    width: 20vw;
     position: relative;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
 }
 
-/* 聊天框 - 保留原有样式 */
+
+
+.ac-game-menu {
+    width: 100%;
+    height: 100%;
+    background-image: url("/static/image/menu/wangfeng.gif");
+    background-size: 100% 100%;
+    user-select: none;
+}
+
+.ac-game-menu-field {
+    width: 20vw;
+    position: relative;
+    top: 40%;
+    left: 20%;
+}
+
+.ac-game-menu-field-item {
+    color: white;
+    height: 6vh;
+    width: 18vw;
+    font-size: 4vh;
+    font-style: italic;
+    text-align: center;
+    background-color: rgba(39,21,28, 0.6);
+    border-radius: 10px;
+    letter-spacing: 0.5vw;
+    cursor: pointer;
+}
+
+.ac-game-menu-field-item:hover {
+    transform: scale(1.2);
+    transition: 100ms;
+}
+
+.ac-game-playground {
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    background-color: grey;
+}
+
+.ac-game-playground > canvas {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 .ac-game-chat-field-history {
     position: absolute;
     top: 66%;
     left: 20%;
+
     transform: translate(-50%, -50%);
+
     width: 20%;
     height: 32%;
+
     color: white;
     font-size: 2vh;
+
     padding: 5px;
     overflow: auto;
 }
@@ -205,9 +191,12 @@
     top: 86%;
     left: 20%;
     transform: translate(-50%, -50%);
+
     width: 20%;
     height: 3vh;
+
     color: white;
     font-size: 2vh;
+
     background-color: rgba(222,225,230, 0.2);
 }

@@ -12,14 +12,11 @@ class FireBall extends AcGameObject {
         this.color = color;
         this.speed = speed;
         this.move_length = move_length;
-        this.eps = 0.01;
         this.damage = damage;
-
-
+        this.eps = 0.01;
     }
 
     start() {
-
     }
 
     update() {
@@ -27,12 +24,13 @@ class FireBall extends AcGameObject {
             this.destroy();
             return false;
         }
+
         this.update_move();
 
-        if (this.player.chacha !== "enemy"){
-
+        if (this.player.character !== "enemy") {
+            this.update_attack();
         }
-        this.update_attack();
+
         this.render();
     }
 
@@ -44,7 +42,7 @@ class FireBall extends AcGameObject {
     }
 
     update_attack() {
-        for (let i = 0; i < this.playground.players.length; i++) {
+        for (let i = 0; i < this.playground.players.length; i ++ ) {
             let player = this.playground.players[i];
             if (this.player !== player && this.is_collision(player)) {
                 this.attack(player);
@@ -64,41 +62,34 @@ class FireBall extends AcGameObject {
         if (distance < this.radius + player.radius)
             return true;
         return false;
-
     }
 
     attack(player) {
         let angle = Math.atan2(player.y - this.y, player.x - this.x);
         player.is_attacked(angle, this.damage);
 
-        if (this.playground.mode === "multi mode"){
-
-            this.playground.mps.send_attack(player.uuid,player.x,player.y,angle, this.damage,this.uuid);
+        if (this.playground.mode === "multi mode") {
+            this.playground.mps.send_attack(player.uuid, player.x, player.y, angle, this.damage, this.uuid);
         }
 
         this.destroy();
-
     }
 
     render() {
         let scale = this.playground.scale;
         this.ctx.beginPath();
-        this.ctx.arc(
-            this.x * scale, this.y * scale, this.radius * scale, 0, Math.PI * 2, false);
+        this.ctx.arc(this.x * scale, this.y * scale, this.radius * scale, 0, Math.PI * 2, false);
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
-
     }
 
     on_destroy() {
         let fireballs = this.player.fireballs;
-        for (let i = 0; i < fireballs.length; i++) {
+        for (let i = 0; i < fireballs.length; i ++ ) {
             if (fireballs[i] === this) {
                 fireballs.splice(i, 1);
                 break;
             }
         }
     }
-
 }
-
