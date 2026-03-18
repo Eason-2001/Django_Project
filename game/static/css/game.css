@@ -1,49 +1,78 @@
+/* 全局基础样式 / 引入背景（保留你的背景） */
 .ac-game-settings {
     width: 100%;
     height: 100%;
     background-image: url("/static/image/menu/menu.gif");
     background-size: 100% 100%;
     user-select: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-.ac-game-settings-login {
-    height: 41vh;
-    width: 20vw;
-    position: relative;
+.ac-game-menu {
+    width: 100%;
+    height: 100%;
+    background-image: url("/static/image/menu/login.gif");
+    background-size: 100% 100%;
+    user-select: none;
+}
+
+/* 登录/注册弹窗容器 (自适应高度) */
+.ac-game-settings-login,
+.ac-game-settings-register {
+    min-height: 55vh; /* 最小高度，内容少时保持 */
+    width: 28vw;
+    position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 5px;
+    transform: translate(-50%, -50%); /* 居中不变 */
+    background: rgba(15, 15, 15, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    box-sizing: border-box;
+    height: auto; /* 高度由内容自动撑开 */
 }
 
-
+/* 标题样式 */
 .ac-game-settings-title {
-    color: white;
-    font-size: 3vh;
+    color: #ffffff;
+    font-size: 3.5vh;
     text-align: center;
-    padding-top: 2vh;
-    margin-bottom: 2vh;
+    font-weight: 700;
+    margin-bottom: 4vh;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
-.ac-game-settings-username {
-    display: block;
-    height: 7vh;
-}
-
-.ac-game-settings-password {
-    display: block;
-    height: 7vh;
-}
-
+/* 输入框区域 (包含确认密码，删除AcWing重复定义) */
+.ac-game-settings-username,
+.ac-game-settings-password,
+.ac-game-settings-confirm-password, /* 确认密码样式 */
 .ac-game-settings-submit {
     display: block;
-    height: 7vh;
+    height: 8vh;
+    margin-bottom: 1.5vh; /* 补全之前缺失的分号 */
 }
 
+/* AcWing 一键登录 (页面固定定位，完整样式，无重复) */
 .ac-game-settings-acwing {
-    display: block;
-    height: 7vh;
+    position: fixed; /* 固定在整个页面 */
+    bottom: 3vh;     /* 距离页面底部3vh */
+    left: 50%;       /* 水平居中 */
+    transform: translateX(-50%); /* 精准居中 */
+    width: 24vw;     /* 宽度适配 */
+    height: 8vh;     /* 固定高度 */
+    display: flex;   /* 显示并居中内部元素 */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;   /* 置顶不被遮挡 */
+    margin: 0;
+    padding: 0;
+    background: transparent; /* 透明无背景框 */
+    border: none;
 }
 
 .ac-game-settings-item {
@@ -51,111 +80,151 @@
     height: 100%;
 }
 
+/* 输入框样式 */
 .ac-game-settings-item > input {
-    width: 90%;
-    line-height: 3vh;
+    width: 85%;
+    height: 5vh;
+    line-height: 5vh;
     position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 1.8vh;
+    padding: 0 15px;
+    outline: none;
+    transition: all 0.3s ease;
 }
 
+/* 输入框 Focus 效果 */
+.ac-game-settings-item > input:focus {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+/* 登录按钮样式 */
 .ac-game-settings-item > button {
-    color: white;
-    width: 90%;
-    line-height: 3vh;
+    width: 85%;
+    height: 5vh;
+    line-height: 5vh;
     position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #4CAF50;
-    border-radius: 5px;
+    background: linear-gradient(135deg, #ff4757, #ff3742);
+    color: white;
+    font-size: 2vh;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+/* 按钮 Hover 效果 */
+.ac-game-settings-item > button:hover {
+    transform: translate(-50%, -50%) scale(1.03);
+    box-shadow: 0 6px 16px rgba(255, 71, 87, 0.5);
+}
+
+/* 按钮 Active 效果 */
+.ac-game-settings-item > button:active {
+    transform: translate(-50%, -50%) scale(0.98);
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+}
+
+/* 提示文字与注册链接 */
+.info-row {
+    width: 85%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 5vh;
 }
 
 .ac-game-settings-error-message {
-    color: red;
-    font-size: 0.8vh;
-    display: inline;
-    float: left;
-    padding-left: 1vw;
+    color: #ff4757;
+    font-size: 1.6vh;
+    font-weight: 500;
 }
 
 .ac-game-settings-option {
-    color: white;
-    font-size: 2vh;
-    display: inline;
-    float: right;
-    padding-right: 1vw;
+    color: #70a1ff;
+    font-size: 1.6vh;
     cursor: pointer;
+    font-weight: 500;
+    transition: color 0.2s;
 }
 
+.ac-game-settings-option:hover {
+    color: #a8dadc;
+    text-decoration: underline;
+}
+
+/* AcWing 一键登录图标样式 */
 .ac-game-settings-acwing > img {
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    width: 4vh;
+    height: 4vh;
     cursor: pointer;
-    display: block;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s;
+}
+
+.ac-game-settings-acwing > img:hover {
+    transform: scale(1.1);
 }
 
 .ac-game-settings-acwing > div {
-    color: white;
-    font-size: 1.5vh;
-    text-align: center;
-    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.4vh;
+    margin-top: 0;
 }
 
-.ac-game-settings-register {
-    height: 49vh;
-    width: 20vw;
-    position: relative;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 5px;
-}
-
-
-
-.ac-game-menu {
-    width: 100%;
-    height: 100%;
-    background-image: url("/static/image/menu/wangfeng.gif");
-    background-size: 100% 100%;
-    user-select: none;
-}
-
+/* 主菜单样式 */
 .ac-game-menu-field {
-    width: 20vw;
+    width: 22vw;
     position: relative;
-    top: 40%;
-    left: 20%;
+    top: 35%;
+    left: 15%;
 }
 
 .ac-game-menu-field-item {
     color: white;
-    height: 6vh;
+    height: 7vh;
     width: 18vw;
-    font-size: 4vh;
-    font-style: italic;
+    font-size: 3.5vh;
+    font-weight: 500;
     text-align: center;
-    background-color: rgba(39,21,28, 0.6);
-    border-radius: 10px;
-    letter-spacing: 0.5vw;
+    line-height: 7vh;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    letter-spacing: 0.1vw;
     cursor: pointer;
+    margin-bottom: 2vh;
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
 }
 
 .ac-game-menu-field-item:hover {
-    transform: scale(1.2);
-    transition: 100ms;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(10px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
+/* 游戏画面与聊天框 */
 .ac-game-playground {
     width: 100%;
     height: 100%;
     user-select: none;
-    background-color: grey;
+    background-color: #0f0f0f;
 }
 
 .ac-game-playground > canvas {
@@ -163,23 +232,23 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    border: 1px solid #333;
 }
 
 .ac-game-chat-field-history {
     position: absolute;
     top: 66%;
     left: 20%;
-
     transform: translate(-50%, -50%);
-
     width: 20%;
     height: 32%;
-
     color: white;
     font-size: 2vh;
-
-    padding: 5px;
+    padding: 10px;
     overflow: auto;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
 }
 
 .ac-game-chat-field-history::-webkit-scrollbar {
@@ -191,12 +260,13 @@
     top: 86%;
     left: 20%;
     transform: translate(-50%, -50%);
-
     width: 20%;
     height: 3vh;
-
     color: white;
     font-size: 2vh;
-
-    background-color: rgba(222,225,230, 0.2);
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 0 10px;
+    outline: none;
 }
