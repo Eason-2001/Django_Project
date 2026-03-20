@@ -25,9 +25,9 @@ class AcGameMenu{
         this.start();
     }
 
-start(){
-    this.add_listening_events();
-}
+    start(){
+        this.add_listening_events();
+    }
 
     add_listening_events(){
         let outer = this;
@@ -53,6 +53,8 @@ start(){
     }
 
 }
+
+
 let AC_GAME_OBJECTS = [];
 
 class AcGameObject{
