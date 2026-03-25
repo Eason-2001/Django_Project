@@ -6,7 +6,7 @@ export class AcGame {
         
        this.settings = new Settings(this);
        this.menu = new AcGameMenu(this);
-       this.hero = new AcHeroSelect();
+       this.hero = new AcHeroSelect(this);
        this.playground = new AcGamePlayground(this);
 
        this.start();

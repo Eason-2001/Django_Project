@@ -270,3 +270,184 @@
     padding: 0 10px;
     outline: none;
 }
+
+/* 英雄选择弹窗主容器 - 完全对齐大厂设计规范 */
+.ac-game-hero-select {
+    min-height: 60vh;
+    width: 32vw;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(15, 15, 15, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 25px;
+    box-sizing: border-box;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 100; /* 确保层级高于游戏界面 */
+}
+
+/* 英雄选择标题样式 - 统一标题规范 */
+.ac-game-hero-select-title {
+    color: #ffffff;
+    font-size: 3.8vh;
+    text-align: center;
+    font-weight: 700;
+    margin: 2vh 0 5vh;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 1px;
+}
+
+/* 英雄展示容器 - 水平居中布局 */
+.ac-game-hero-select-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vw;
+    width: 100%;
+    margin-bottom: 6vh;
+}
+
+/* 左右切换箭头 - 统一交互样式 */
+.ac-game-hero-select-arrow-left,
+.ac-game-hero-select-arrow-right {
+    width: 6vh;
+    height: 6vh;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5vh;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+/* 箭头 hover 交互效果 */
+.ac-game-hero-select-arrow-left:hover,
+.ac-game-hero-select-arrow-right:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* 英雄图片展示区 */
+.ac-game-hero-select-image {
+    width: 18vw;
+    height: 28vh;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* 图片区域 hover 效果 */
+.ac-game-hero-select-image:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+/* 确定按钮 - 完全沿用登录按钮渐变样式 */
+.ac-game-hero-select-btn {
+    width: 85%;
+    height: 6vh;
+    line-height: 6vh;
+    background: linear-gradient(135deg, #ff4757, #ff3742);
+    color: white;
+    font-size: 2.2vh;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+    text-align: center;
+    outline: none;
+}
+
+/* 按钮 hover 效果 */
+.ac-game-hero-select-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+    filter: brightness(1.1);
+}
+
+/* 按钮点击效果 */
+.ac-game-hero-select-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+}
+
+/* 技能展示容器 */
+.ac-game-hero-select-skills {
+    width: 85%;
+    margin: 2vh 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vh;
+}
+
+/* 单个技能项 */
+.ac-game-hero-skill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1.5vh 2vh;
+}
+
+.ac-game-hero-skill-name {
+    color: #ff4757;
+    font-size: 2vh;
+    font-weight: 600;
+    margin-bottom: 0.5vh;
+}
+
+.ac-game-hero-skill-desc {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.6vh;
+    line-height: 1.4;
+}
+/* 英雄名称样式 */
+.ac-game-hero-name {
+    color: #ff4757;
+    font-size: 3.2vh;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 3vh;
+    text-shadow: 0 2px 8px rgba(255,71,87,0.4);
+    letter-spacing: 1px;
+}
+
+/* 优化头像卡片 */
+.ac-game-hero-select-image {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.ac-game-hero-total {
+    background-image: url("/static/image/menu/hero_select.gif");
+    background-size: cover;  /* 让背景图铺满容器 */
+    background-position: center;
+    width: 100%;
+    height: 100%;  /* 或固定高度，比如 600px */
+    position: absolute;
+    top: 0;
+    left: 0;
+}
