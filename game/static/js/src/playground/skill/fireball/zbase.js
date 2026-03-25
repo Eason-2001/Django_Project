@@ -1,4 +1,4 @@
-class FireBall extends AcGameObject {
+export class FireBall extends AcGameObject {
     constructor(playground, player, x, y, radius, vx, vy, color, speed, move_length, damage) {
         super();
         this.playground = playground;
@@ -16,78 +16,57 @@ class FireBall extends AcGameObject {
         this.eps = 0.01;
     }
 
-    start() {
-    }
-
     update() {
         if (this.move_length < this.eps) {
             this.destroy();
-            return false;
+            return;
         }
-
         this.update_move();
-
-        if (this.player.character !== "enemy") {
-            this.update_attack();
-        }
-
+        this.update_attack();
         this.render();
     }
 
     update_move() {
-        let moved = Math.min(this.move_length, this.speed * this.timedelta / 1000);
+        const moved = Math.min(this.move_length, this.speed * this.timedelta / 1000);
         this.x += this.vx * moved;
         this.y += this.vy * moved;
         this.move_length -= moved;
     }
 
     update_attack() {
-        for (let i = 0; i < this.playground.players.length; i ++ ) {
-            let player = this.playground.players[i];
-            if (this.player !== player && this.is_collision(player)) {
-                this.attack(player);
+        for (const p of this.playground.players) {
+            if (this.player !== p && this.is_collision(p)) {
+                this.attack(p);
                 break;
             }
         }
     }
 
-    get_dist(x1, y1, x2, y2) {
-        let dx = x1 - x2;
-        let dy = y1 - y2;
-        return Math.sqrt(dx * dx + dy * dy);
+    is_collision(p) {
+        const dx = this.x - p.x;
+        const dy = this.y - p.y;
+        return Math.sqrt(dx * dx + dy * dy) < this.radius + p.radius;
     }
 
-    is_collision(player) {
-        let distance = this.get_dist(this.x, this.y, player.x, player.y);
-        if (distance < this.radius + player.radius)
-            return true;
-        return false;
-    }
-
-    attack(player) {
-        let angle = Math.atan2(player.y - this.y, player.x - this.x);
-        player.is_attacked(angle, this.damage);
-
-        if (this.playground.mode === "multi mode") {
-            this.playground.mps.send_attack(player.uuid, player.x, player.y, angle, this.damage, this.uuid);
-        }
-
+    attack(p) {
+        const angle = Math.atan2(p.y - this.y, p.x - this.x);
+        p.is_attacked(angle, this.damage);
         this.destroy();
     }
 
     render() {
-        let scale = this.playground.scale;
+        const s = this.playground.scale;
         this.ctx.beginPath();
-        this.ctx.arc(this.x * scale, this.y * scale, this.radius * scale, 0, Math.PI * 2, false);
+        this.ctx.arc(this.x * s, this.y * s, this.radius * s, 0, Math.PI * 2);
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
     }
 
     on_destroy() {
-        let fireballs = this.player.fireballs;
-        for (let i = 0; i < fireballs.length; i ++ ) {
-            if (fireballs[i] === this) {
-                fireballs.splice(i, 1);
+        const fbs = this.player.fireballs;
+        for (let i = 0; i < fbs.length; i++) {
+            if (fbs[i] === this) {
+                fbs.splice(i, 1);
                 break;
             }
         }

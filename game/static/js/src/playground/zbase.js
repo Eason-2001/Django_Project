@@ -48,7 +48,7 @@ class AcGamePlayground {
         if (this.game_map) this.game_map.resize();
     }
 
-    show(mode) {  // 打开playground界面
+    show(mode,selected_hero) {  // 打开playground界面
         let outer = this;
         this.$playground.show();
 
@@ -65,11 +65,12 @@ class AcGamePlayground {
         this.resize();
 
         this.players = [];
-        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, "white", 0.15, "me", this.root.settings.username, this.root.settings.photo));
+        this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, "white", 0.15, "me", this.root.settings.username, this.root.settings.photo, selected_hero));
 
         if (mode === "single mode") {
             for (let i = 0; i < 5; i ++ ) {
-                this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.15, "robot"));
+                let random_hero = this.root.hero.heroes[Math.floor(Math.random() * 3)];
+this.players.push(new Player(this, this.width / 2 / this.scale, 0.5, 0.05, this.get_random_color(), 0.15, "robot", "机器人", random_hero.avatar, random_hero));
             }
         } else if (mode === "multi mode") {
             this.chat_field = new ChatField(this);
