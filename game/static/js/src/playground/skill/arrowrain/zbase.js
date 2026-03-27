@@ -6,18 +6,30 @@ export class ArrowRain extends AcGameObject {
         this.tx = tx;
         this.ty = ty;
         this.damage = damage;
-        this.counter = 0;
+
+        this.radius = 200;   // 攻击范围（像素）
+        this.duration = 400; // 持续时间(ms)
+        this.elapsed = 0;
     }
 
     update() {
-        if (this.counter++ > 8) {
+        this.elapsed += this.timedelta;
+
+        if (this.elapsed > this.duration) {
             this.destroy();
             return;
         }
-        this.playground.players.forEach(p => {
-            if (this.player.get_dist(this.tx, this.ty, p.x, p.y) < 0.25) {
-                p.is_attacked(Math.random() * Math.PI * 2, this.damage / 3);
+
+        for (let p of this.playground.players) {
+            if (p !== this.player) {
+                let dx = p.x - this.tx;
+                let dy = p.y - this.ty;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < this.radius) {
+                    p.is_attacked(Math.random() * Math.PI * 2, this.damage);
+                }
             }
-        });
+        }
     }
 }
