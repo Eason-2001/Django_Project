@@ -25,21 +25,20 @@ class AcGamePlayground {
     }
 
     show(mode, hero) {
-        this.hero = hero;
-        this.scale = this.height / 1080;
         this.$playground.show();
-
-
         this.width = this.$playground.width();
         this.height = this.$playground.height();
-
+        this.resize();
         this.game_map = new GameMap(this);
+
+        this.mini_map = new MiniMap(this);
+        this.hero_list = this.root.hero.heroes;
+        this.hero = hero;
+        this.scale = this.height / 1080;
 
         this.mode = mode;
         this.state = "waiting";
         this.player_count = 0;
-
-        this.resize();
 
         this.players = [];
 
@@ -61,6 +60,10 @@ class AcGamePlayground {
 
         // 机器人
         for (let i = 0; i < 5; i++) {
+
+            // ⭐ 随机选一个英雄
+            let hero = this.hero_list[Math.floor(Math.random() * this.hero_list.length)];
+
             this.players.push(
                 new Player(
                     this,
@@ -70,8 +73,9 @@ class AcGamePlayground {
                     "red",
                     200,
                     "robot",
-                    "robot",
-                    ""
+                    hero.name,
+                    hero.avatar,
+                    hero   // ⭐ 给AI也传hero！
                 )
             );
         }

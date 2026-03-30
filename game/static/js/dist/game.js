@@ -1,15 +1,17 @@
+
 class AcHeroSelect {
     constructor(root) {
         this.root = root;
+
         this.heroes = [
             {
                 id: 1,
                 name: "武僧马嘉祺",
                 avatar: "/static/image/menu/majiaqi.jpg",
                 skills: [
-                    { name: "冲锋", desc: "快速冲向敌人并造成眩晕" },
-                    { name: "旋风斩", desc: "旋转攻击周围所有敌人" },
-                    { name: "斩杀", desc: "对低血量敌人造成真实伤害" }
+                    { name: "冲锋", desc: "快速冲向敌人并造成眩晕", class: Blink },
+                    { name: "旋风斩", desc: "旋转攻击周围所有敌人", class: Whirlwind },
+                    { name: "斩杀", desc: "对低血量敌人造成真实伤害", class: Execute }
                 ]
             },
             {
@@ -17,9 +19,9 @@ class AcHeroSelect {
                 name: "邪恶小明睿",
                 avatar: "/static/image/menu/mingrui.jpg",
                 skills: [
-                    { name: "火球术", desc: "发射火球造成范围伤害" },
-                    { name: "冰霜新星", desc: "冻结周围敌人并减速" },
-                    { name: "闪现", desc: "瞬间位移到指定位置" }
+                    { name: "火球术", desc: "发射火球造成范围伤害", class: FireBall },
+                    { name: "冰霜新星", desc: "冻结周围敌人并减速", class: FrostNova },
+                    { name: "闪现", desc: "瞬间位移到指定位置", class: Blink }
                 ]
             },
             {
@@ -27,19 +29,20 @@ class AcHeroSelect {
                 name: "老炮手佳批",
                 avatar: "/static/image/menu/chengjia.jpg",
                 skills: [
-                    { name: "精准射击", desc: "对单个目标造成高额伤害" },
-                    { name: "箭雨", desc: "向空中射出大量箭矢造成范围伤害" },
-                    { name: "闪避", desc: "短暂免疫伤害并向后位移" }
+                    { name: "精准射击", desc: "对单个目标造成高额伤害", class: FireBall },
+                    { name: "箭雨", desc: "向空中射出大量箭矢造成范围伤害", class: ArrowRain },
+                    { name: "闪避", desc: "短暂免疫伤害并向后位移", class: Blink }
                 ]
             }
         ];
+
         this.current_idx = 0;
+
         this.$hero_select = $(`
             <div class="ac-game-hero-total">
                 <div class="ac-game-hero-select">
                     <div class="ac-game-hero-select-title">选择你的英雄</div>
                     
-                    <!-- 英雄名字 动态显示 -->
                     <div class="ac-game-hero-name"></div>
     
                     <div class="ac-game-hero-select-container">
@@ -53,6 +56,7 @@ class AcHeroSelect {
                 </div>
             </div>
         `);
+
         this.$hero_select.hide();
         this.root.$ac_game.append(this.$hero_select);
 
@@ -60,7 +64,7 @@ class AcHeroSelect {
         this.$arrow_left = this.$hero_select.find('.ac-game-hero-select-arrow-left');
         this.$arrow_right = this.$hero_select.find('.ac-game-hero-select-arrow-right');
         this.$hero_image = this.$hero_select.find('.ac-game-hero-select-image');
-        this.$hero_name = this.$hero_select.find('.ac-game-hero-name'); // 英雄名字
+        this.$hero_name = this.$hero_select.find('.ac-game-hero-name');
         this.$skills_container = this.$hero_select.find('.ac-game-hero-select-skills');
 
         this.start();
@@ -71,21 +75,17 @@ class AcHeroSelect {
         this.add_listening_events();
     }
 
-    // 渲染：头像 + 名字 + 技能
     render() {
         const hero = this.heroes[this.current_idx];
 
-        // 1. 更新头像
         this.$hero_image.css({
             "background-image": `url(${hero.avatar})`,
             "background-size": "cover",
             "background-position": "center"
         });
 
-        // 2. ✅ 更新英雄名字
         this.$hero_name.text(hero.name);
 
-        // 3. 更新技能
         let skills_html = "";
         for (let skill of hero.skills) {
             skills_html += `
@@ -101,27 +101,31 @@ class AcHeroSelect {
     add_listening_events() {
         let outer = this;
 
-        // 确定
-        this.$confirm_btn.click(function() {
+        this.$confirm_btn.click(function () {
             outer.hide();
+
+            // ⭐ 关键：传整个 hero（带 class）
             outer.root.playground.show("single mode", outer.heroes[outer.current_idx]);
         });
 
-        // 左箭头
-        this.$arrow_left.click(function() {
+        this.$arrow_left.click(function () {
             outer.current_idx = (outer.current_idx - 1 + outer.heroes.length) % outer.heroes.length;
             outer.render();
         });
 
-        // 右箭头
-        this.$arrow_right.click(function() {
+        this.$arrow_right.click(function () {
             outer.current_idx = (outer.current_idx + 1) % outer.heroes.length;
             outer.render();
         });
     }
 
-    show() { this.$hero_select.show(); }
-    hide() { this.$hero_select.hide(); }
+    show() {
+        this.$hero_select.show();
+    }
+
+    hide() {
+        this.$hero_select.hide();
+    }
 }class AcGameMenu{
     constructor(root){
         this.root = root;
@@ -330,7 +334,7 @@ class GameMap extends AcGameObject {
         super();
         this.playground = playground;
 
-        // 世界地图大小
+        // 世界地图大小 (5000x5000)
         this.map_width = 5000;
         this.map_height = 5000;
 
@@ -346,6 +350,18 @@ class GameMap extends AcGameObject {
         this.ctx.canvas.height = this.viewport_height;
 
         this.playground.$playground.append(this.$canvas);
+
+        // ⭐ 优化：生成 300 颗随机星星
+        this.stars = [];
+        for (let i = 0; i < 300; i++) {
+            this.stars.push({
+                x: Math.random() * this.viewport_width,  // 初始分布在当前屏幕
+                y: Math.random() * this.viewport_height, // 初始分布在当前屏幕
+                radius: Math.random() * 1.5 + 0.5,       // 星星大小 0.5~2px
+                speed_factor: Math.random() * 0.3 + 0.2, // ⭐ 关键：每颗星移动速度不同，更有层次感
+                color: `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.3})`
+            });
+        }
     }
 
     start() {
@@ -360,6 +376,7 @@ class GameMap extends AcGameObject {
         this.ctx.canvas.height = this.viewport_height;
     }
 
+    // 世界坐标转视口坐标 (用于画边界线和玩家)
     map_to_viewport(x, y) {
         return {
             x: x - this.viewport_x,
@@ -370,25 +387,140 @@ class GameMap extends AcGameObject {
     update_viewport(target) {
         if (!target) return;
 
+        // 让视角中心对准目标玩家
         this.viewport_x = target.x - this.viewport_width / 2;
         this.viewport_y = target.y - this.viewport_height / 2;
 
+        // 限制视角不超出 5000x5000 的世界地图边缘
         this.viewport_x = Math.max(0, Math.min(this.viewport_x, this.map_width - this.viewport_width));
         this.viewport_y = Math.max(0, Math.min(this.viewport_y, this.map_height - this.viewport_height));
     }
 
+    // ⭐ 核心优化：带视差滚动的星星渲染
+    render_stars() {
+        for (let star of this.stars) {
+            // 根据视口偏移和星星自身的速率系数计算绘制位置
+            // 使用取模 (%) 运算确保星星在屏幕边缘消失后从另一侧冒出来（无限循环背景）
+            let x = (star.x - this.viewport_x * star.speed_factor) % this.viewport_width;
+            let y = (star.y - this.viewport_y * star.speed_factor) % this.viewport_height;
+
+            // 处理取模后的负数情况，确保坐标永远在视口内
+            if (x < 0) x += this.viewport_width;
+            if (y < 0) y += this.viewport_height;
+
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, star.radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = star.color;
+            this.ctx.fill();
+        }
+    }
+
     render() {
+        // 1. 清理画布
         this.ctx.clearRect(0, 0, this.viewport_width, this.viewport_height);
 
+        // 2. 绘制黑色宇宙背景
         this.ctx.fillStyle = "black";
         this.ctx.fillRect(0, 0, this.viewport_width, this.viewport_height);
+
+        // 3. 绘制会滚动的星星
+        this.render_stars();
+
+        // 4. 绘制世界地图的白色边界线 (5000x5000 的大框)
+        this.ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+        this.ctx.lineWidth = 4;
+        let border = this.map_to_viewport(0, 0);
+        this.ctx.strokeRect(border.x, border.y, this.map_width, this.map_height);
     }
 
     update() {
-        if (this.playground.players.length > 0) {
+        // 锁定视角到“我”这个玩家
+        let me = null;
+        for (let p of this.playground.players) {
+            if (p.character === "me") {
+                me = p;
+                break;
+            }
+        }
+
+        if (me) {
+            this.update_viewport(me);
+        } else if (this.playground.players.length > 0) {
             this.update_viewport(this.playground.players[0]);
         }
+
         this.render();
+    }
+}class MiniMap extends AcGameObject {
+    constructor(playground) {
+        super();
+        this.playground = playground;
+        this.width = 200;
+        this.height = 200;
+
+        this.$canvas = $(`<canvas class="mini-map"></canvas>`);
+        this.ctx = this.$canvas[0].getContext('2d');
+
+        this.ctx.canvas.width = this.width;
+        this.ctx.canvas.height = this.height;
+
+        this.playground.$playground.append(this.$canvas);
+
+        // ⭐ 核心修复：强制重置 CSS 样式，确保在右下角且不被居中规则干扰
+        this.$canvas.css({
+            "position": "absolute",
+            "bottom": "20px",
+            "right": "20px",
+            "top": "auto",
+            "left": "auto",
+            "transform": "none",
+            "background": "rgba(0,0,0,0.5)",
+            "border": "2px solid white",
+            "z-index": "1000" // 确保在最顶层
+        });
+    }
+
+    update() {
+        this.render();
+    }
+
+    render() {
+        const map = this.playground.game_map;
+        if (!map) return;
+
+        const ctx = this.ctx;
+        ctx.clearRect(0, 0, this.width, this.height);
+
+        // 1. 绘制半透明黑色背景
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.fillRect(0, 0, this.width, this.height);
+
+        // 2. 绘制玩家点
+        for (let p of this.playground.players) {
+            // 计算玩家在小地图上的比例坐标
+            let x = (p.x / map.map_width) * this.width;
+            let y = (p.y / map.map_height) * this.height;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+
+            if (p.character === "me") {
+                ctx.fillStyle = "#00FF00"; // 自己显示为亮绿色
+            } else {
+                ctx.fillStyle = "#FF0000"; // 敌人显示为红色
+            }
+            ctx.fill();
+        }
+
+        // 3. 绘制黄色视野框（代表当前屏幕在世界地图的哪个位置）
+        let vx = (map.viewport_x / map.map_width) * this.width;
+        let vy = (map.viewport_y / map.map_height) * this.height;
+        let vw = (map.viewport_width / map.map_width) * this.width;
+        let vh = (map.viewport_height / map.map_height) * this.height;
+
+        ctx.strokeStyle = "yellow";
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(vx, vy, vw, vh);
     }
 }class NoticeBoard extends AcGameObject {
     constructor(playground) {
@@ -461,36 +593,39 @@ class Particle extends AcGameObject {
     }
 }
 class Player extends AcGameObject {
+    // Player.js
     constructor(playground, x, y, radius, color, speed, character, username, photo, hero) {
         super();
-
         this.playground = playground;
         this.hero = hero;
         this.ctx = this.playground.game_map.ctx;
 
         this.x = x;
         this.y = y;
-
-        this.vx = 0;
-        this.vy = 0;
-        this.move_length = 0;
-
         this.radius = radius;
         this.color = color;
         this.speed = speed;
-
         this.character = character;
-        this.username = username;
 
-        this.photo = photo;
-
-        this.mouse_x = this.x;
-        this.mouse_y = this.y;
-
-        if (this.character !== "robot") {
-            this.img = new Image();
-            this.img.src = this.photo;
+        // ⭐ 修改点：如果是机器人且传入了英雄对象，直接继承该英雄的属性
+        if (this.character === "robot" && this.hero) {
+            this.username = this.hero.name; // Bot 名字显示为英雄名
+            this.photo = this.hero.avatar;  // Bot 头像使用英雄头像
+        } else {
+            this.username = username;
+            this.photo = photo;
         }
+
+        // 统一图片加载逻辑（不需要改动，保持你原来的即可）
+        this.img = new Image();
+        this.img.src = this.photo;
+        this.img_loaded = false;
+        let outer = this;
+        this.img.onload = function () {
+            outer.img_loaded = true;
+        }
+
+        // ... 其他初始化代码 (mouse_x, vx, vy 等)
     }
 
     start() {
@@ -503,25 +638,37 @@ class Player extends AcGameObject {
         if (this.playground.player_count >= 1) {
             this.playground.state = "fighting";
         }
+
+        if (this.character === "robot") {
+            this.set_random_move();
+            this.set_random_skill();
+        }
     }
 
     add_listening_events() {
         const canvas = this.playground.game_map.$canvas;
         const outer = this;
 
-        // 禁止右键菜单（LOL必须）
+        // 点击canvas获取焦点（保证能按键）
+        canvas.mousedown(function () {
+            canvas.focus();
+        });
+
+        // 禁止右键菜单
         canvas.on("contextmenu", e => e.preventDefault());
 
+        // 🎮 键盘技能释放（已修复）
         canvas.keydown(function (e) {
+            if (outer.playground.state !== "fighting") return;
+
             if (e.which === 81) { // Q
-                let skill = outer.hero.skills[0];
-                console.log("释放", skill.name);
+                outer.cast_skill(outer.hero.skills[0]);
             }
             if (e.which === 87) { // W
-                let skill = outer.hero.skills[1];
+                outer.cast_skill(outer.hero.skills[1]);
             }
             if (e.which === 69) { // E
-                let skill = outer.hero.skills[2];
+                outer.cast_skill(outer.hero.skills[2]);
             }
         });
 
@@ -554,6 +701,47 @@ class Player extends AcGameObject {
         });
     }
 
+    // 🔥 核心：技能释放系统
+    cast_skill(skill) {
+        if (!skill || !skill.class) return;
+
+        console.log("释放技能:", skill.name);
+
+        let tx = this.mouse_x;
+        let ty = this.mouse_y;
+
+        // ⭐ 统一用 class 创建技能
+        if (skill.class === FireBall) {
+            let dx = tx - this.x;
+            let dy = ty - this.y;
+            let angle = Math.atan2(dy, dx);
+
+            new FireBall(
+                this.playground,
+                this,
+                this.x,
+                this.y,
+                10,
+                Math.cos(angle),
+                Math.sin(angle),
+                "orange",
+                500,
+                1000,
+                10
+            );
+        } else if (skill.class === Blink) {
+            new Blink(this.playground, this, tx, ty);
+        } else if (skill.class === ArrowRain) {
+            new ArrowRain(this.playground, this, tx, ty, 20);
+        } else if (skill.class === FrostNova) {
+            new FrostNova(this.playground, this, 15);
+        } else if (skill.class === Whirlwind) {
+            new Whirlwind(this.playground, this, 10);
+        } else if (skill.class === Execute) {
+            new Execute(this.playground, this, 30);
+        }
+    }
+
     move_to(tx, ty) {
         const dx = tx - this.x;
         const dy = ty - this.y;
@@ -568,6 +756,11 @@ class Player extends AcGameObject {
     update_move() {
         if (this.move_length < 1) {
             this.move_length = 0;
+            // 如果是人机且停下了，给它一个新的随机目标，防止原地发呆
+            if (this.character === "robot") {
+                this.move_to(Math.random() * this.playground.game_map.map_width,
+                    Math.random() * this.playground.game_map.map_height);
+            }
             return;
         }
 
@@ -579,6 +772,24 @@ class Player extends AcGameObject {
         this.x += this.vx * moved;
         this.y += this.vy * moved;
         this.move_length -= moved;
+
+        // ⭐ 边缘反弹逻辑：如果撞墙了，立刻换方向
+        let margin = 5; // 距离边界 5 像素就触发反弹
+        let map_w = this.playground.game_map.map_width;
+        let map_h = this.playground.game_map.map_height;
+
+        if (this.x <= margin || this.x >= map_w - margin) {
+            this.vx *= -1; // 水平反弹
+            this.move_length += 100; // 撞墙后多给点移动距离，防止卡在边缘
+        }
+        if (this.y <= margin || this.y >= map_h - margin) {
+            this.vy *= -1; // 垂直反弹
+            this.move_length += 100;
+        }
+
+        // 最终硬性物理限制（防止穿模）
+        this.x = Math.max(0, Math.min(this.x, map_w));
+        this.y = Math.max(0, Math.min(this.y, map_h));
     }
 
     update() {
@@ -589,16 +800,18 @@ class Player extends AcGameObject {
     render() {
         const gm = this.playground.game_map;
         const ctx = this.ctx;
-        const scale = this.playground.scale || 1;
 
         const pos = gm.map_to_viewport(this.x, this.y);
 
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, this.radius, 0, Math.PI * 2);
 
-        if (this.character !== "robot") {
+        // ⭐ 4. 统一改为图片圆柱剪裁绘制
+        if (this.img_loaded) {
             ctx.save();
-            ctx.clip();
+            ctx.clip(); // 将当前的圆形路径设为剪裁区域
+
+            // 绘制图片，使其中心对准玩家坐标，大小刚好覆盖圆形
             ctx.drawImage(
                 this.img,
                 pos.x - this.radius,
@@ -606,12 +819,140 @@ class Player extends AcGameObject {
                 this.radius * 2,
                 this.radius * 2
             );
-            ctx.restore();
+            ctx.restore(); // 恢复剪裁之前的状态，防止影响后续绘制
         } else {
+            // 如果图片还没加载完，先画个底色垫着
             ctx.fillStyle = this.color;
             ctx.fill();
         }
     }
+
+    get_dist(x1, y1, x2, y2) {
+        let dx = x1 - x2;
+        let dy = y1 - y2;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    is_attacked(angle, damage) {
+        if (this.invincible) return;
+
+        console.log("受到伤害:", damage);
+
+        // ✅ 半径变小 = 血量
+        this.radius -= damage * 0.3;
+        ;
+
+        // ✅ 击退
+        this.x += Math.cos(angle) * damage * 0.5;
+        this.y += Math.sin(angle) * damage * 0.5;
+
+        // ✅ 粒子特效
+        for (let i = 0; i < 10; i++) {
+            new Particle(
+                this.playground,
+                this.x,
+                this.y,
+                Math.random() * 5,
+                Math.cos(angle + Math.random()),
+                Math.sin(angle + Math.random()),
+                this.color,
+                Math.random() * 200,
+                Math.random() * 50
+            );
+        }
+
+        // 💀 死亡判定
+        if (this.radius <= 0) {
+            this.destroy();
+        }
+    }
+
+    on_destroy() {
+        let players = this.playground.players;
+        for (let i = 0; i < players.length; i++) {
+            if (players[i] === this) {
+                players.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    set_random_move() {
+        let outer = this;
+
+        // 初始随机方向
+        this.vx = Math.random() * 2 - 1;
+        this.vy = Math.random() * 2 - 1;
+
+        setInterval(function () {
+            if (outer.playground.state !== "fighting") return;
+
+            // ⭐ 小幅改变方向（关键！）
+            outer.vx += (Math.random() * 2 - 1) * 0.3;
+            outer.vy += (Math.random() * 2 - 1) * 0.3;
+
+            // 归一化（防止速度爆炸）
+            let len = Math.sqrt(outer.vx * outer.vx + outer.vy * outer.vy);
+            if (len > 0) {
+                outer.vx /= len;
+                outer.vy /= len;
+            }
+
+            // ⭐ 持续移动
+            outer.move_length = 100; // 一小段距离
+
+        }, 200); // 每0.2秒微调一次
+    }
+
+    set_random_skill() {
+        let outer = this;
+
+        let delay = 3000 + Math.random() * 3000; // 3~6秒
+
+        setTimeout(function () {
+
+            if (outer.playground.state !== "fighting") return;
+
+            // ⭐ 找最近敌人
+            let target = outer.find_target();
+
+            if (target) {
+                outer.mouse_x = target.x;
+                outer.mouse_y = target.y;
+
+                // ⭐ 随机技能
+                let skills = outer.hero.skills;
+                let skill = skills[Math.floor(Math.random() * skills.length)];
+
+                outer.cast_skill(skill);
+            }
+
+            // 🔁 递归继续放技能
+            outer.set_random_skill();
+
+        }, delay);
+    }
+
+    find_target() {
+        let min_dist = Infinity;
+        let target = null;
+
+        for (let p of this.playground.players) {
+            if (p !== this) {
+                let dx = this.x - p.x;
+                let dy = this.y - p.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < min_dist) {
+                    min_dist = dist;
+                    target = p;
+                }
+            }
+        }
+
+        return target;
+    }
+
 }class ScoreBoard extends AcGameObject {
     constructor(playground) {
         super();
@@ -671,7 +1012,7 @@ class Player extends AcGameObject {
         }
     }
 }
-export class ArrowRain extends AcGameObject {
+class ArrowRain extends AcGameObject {
     constructor(playground, player, tx, ty, damage) {
         super();
         this.playground = playground;
@@ -705,7 +1046,7 @@ export class ArrowRain extends AcGameObject {
             }
         }
     }
-}export class Blink extends AcGameObject {
+}class Blink extends AcGameObject {
     constructor(playground, player, tx, ty, stun = false, invincible = false) {
         super();
         this.playground = playground;
@@ -727,34 +1068,16 @@ export class ArrowRain extends AcGameObject {
         let dist = Math.sqrt(dx * dx + dy * dy);
 
         dist = Math.min(dist, this.max_dist);
-
         const angle = Math.atan2(dy, dx);
 
+        // 瞬间改变坐标
         p.x += Math.cos(angle) * dist;
         p.y += Math.sin(angle) * dist;
-        p.move_length = 0;
 
-        // 控制效果
-        if (this.stun) {
-            for (let t of this.playground.players) {
-                if (t !== p) {
-                    let d = p.get_dist(p.x, p.y, t.x, t.y);
-                    if (d < 150) {
-                        t.stun = true;
-                        setTimeout(() => t.stun = false, 800);
-                    }
-                }
-            }
-        }
-
-        if (this.invincible) {
-            p.invincible = true;
-            setTimeout(() => p.invincible = false, 600);
-        }
 
         this.destroy();
     }
-}export class Execute extends AcGameObject {
+}class Execute extends AcGameObject {
     constructor(playground, player, damage) {
         super();
         this.playground = playground;
@@ -779,7 +1102,7 @@ export class ArrowRain extends AcGameObject {
 
         this.destroy();
     }
-}export class FireBall extends AcGameObject {
+}class FireBall extends AcGameObject {
     constructor(playground, player, x, y, radius, vx, vy, color, speed, move_length, damage) {
         super();
 
@@ -852,7 +1175,7 @@ export class ArrowRain extends AcGameObject {
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
     }
-}export class FrostNova extends AcGameObject {
+}class FrostNova extends AcGameObject {
     constructor(playground, player, damage) {
         super();
         this.playground = playground;
@@ -880,7 +1203,7 @@ export class ArrowRain extends AcGameObject {
 
         this.destroy();
     }
-}export class Whirlwind extends AcGameObject {
+}class Whirlwind extends AcGameObject {
     constructor(playground, player, damage) {
         super();
 
@@ -1106,57 +1429,60 @@ class AcGamePlayground {
     }
 
     show(mode, hero) {
-        this.hero = hero;
-        this.scale = this.height / 1080;
-        this.$playground.show();
+    this.$playground.show();
+    this.width = this.$playground.width();
+    this.height = this.$playground.height();
+    this.resize();
+    this.game_map = new GameMap(this);
+    this.mini_map = new MiniMap(this);
 
+    this.hero_list = this.root.hero.heroes; // 获取英雄池
+    this.hero = hero;                       // 玩家选中的英雄
+    this.scale = this.height / 1080;
 
-        this.width = this.$playground.width();
-        this.height = this.$playground.height();
+    this.mode = mode;
+    this.state = "waiting";
+    this.player_count = 0;
 
-        this.game_map = new GameMap(this);
+    this.players = [];
 
-        this.mode = mode;
-        this.state = "waiting";
-        this.player_count = 0;
+    // 1. 生成主角（玩家自己）
+    this.players.push(
+        new Player(
+            this,
+            this.game_map.map_width / 2,
+            this.game_map.map_height / 2,
+            50,
+            "white",
+            300,
+            "me",
+            this.hero.name,
+            this.hero.avatar,
+            this.hero
+        )
+    );
 
-        this.resize();
+    // 2. ⭐ 生成 5 个随机类型的 Bot
+    for (let i = 0; i < 5; i++) {
+        // 每一轮循环都随机抽一个英雄配置
+        let random_hero = this.hero_list[Math.floor(Math.random() * this.hero_list.length)];
 
-        this.players = [];
-
-        // 主角（世界中心）
         this.players.push(
             new Player(
                 this,
-                this.game_map.map_width / 2,
-                this.game_map.map_height / 2,
+                Math.random() * this.game_map.map_width,  // 随机出生 X
+                Math.random() * this.game_map.map_height, // 随机出生 Y
                 50,
                 "white",
-                300,
-                "me",
-                this.hero.name,
-                this.hero.avatar,   // ⭐用英雄头像
-                this.hero           // ⭐把整个英雄传进去
+                200,                                      // Bot 速度稍慢一点
+                "robot",
+                random_hero.name,                         // Bot 名字
+                random_hero.avatar,                       // Bot 头像
+                random_hero                               // ⭐ 传入随机英雄对象
             )
         );
-
-        // 机器人
-        for (let i = 0; i < 5; i++) {
-            this.players.push(
-                new Player(
-                    this,
-                    Math.random() * this.game_map.map_width,
-                    Math.random() * this.game_map.map_height,
-                    50,
-                    "red",
-                    200,
-                    "robot",
-                    "robot",
-                    ""
-                )
-            );
-        }
     }
+}
 
     hide() {
         this.$playground.empty();

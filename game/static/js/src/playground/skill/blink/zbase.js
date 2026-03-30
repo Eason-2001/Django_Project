@@ -20,30 +20,16 @@ export class Blink extends AcGameObject {
         let dist = Math.sqrt(dx * dx + dy * dy);
 
         dist = Math.min(dist, this.max_dist);
-
         const angle = Math.atan2(dy, dx);
 
+        // 瞬间改变坐标
         p.x += Math.cos(angle) * dist;
         p.y += Math.sin(angle) * dist;
-        p.move_length = 0;
 
-        // 控制效果
-        if (this.stun) {
-            for (let t of this.playground.players) {
-                if (t !== p) {
-                    let d = p.get_dist(p.x, p.y, t.x, t.y);
-                    if (d < 150) {
-                        t.stun = true;
-                        setTimeout(() => t.stun = false, 800);
-                    }
-                }
-            }
-        }
+        // ⭐ 关键：不要设置 p.move_length = 0!
+        // 这样闪现完后，如果之前有移动目标，玩家会继续向原目标丝滑滑行。
 
-        if (this.invincible) {
-            p.invincible = true;
-            setTimeout(() => p.invincible = false, 600);
-        }
+        // 如果你希望闪现完依然有惯性，可以保留当前的 vx, vy
 
         this.destroy();
     }

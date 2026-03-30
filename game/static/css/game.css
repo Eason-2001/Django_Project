@@ -227,8 +227,8 @@
     background-color: #0f0f0f;
 }
 
-.ac-game-playground > canvas {
-    position: relative;
+.ac-game-playground > canvas:not(.mini-map) {
+    position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -450,4 +450,16 @@
     position: absolute;
     top: 0;
     left: 0;
+}
+
+/* 确保小地图相对于游戏区域定位 */
+.ac-game-playground {
+    position: relative; /* 必须加！否则 absolute 的小地图会飘到网页最下面 */
+    overflow: hidden;
+}
+
+/* 强制提升小地图 Canvas 的显示层级 */
+.mini-map {
+    z-index: 50; /* 确保它在主地图 canvas (默认0或1) 之上 */
+    pointer-events: none; /* 穿透点击：点击小地图区域依然能操作英雄移动 */
 }

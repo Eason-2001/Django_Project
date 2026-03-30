@@ -1,15 +1,16 @@
 class AcHeroSelect {
     constructor(root) {
         this.root = root;
+
         this.heroes = [
             {
                 id: 1,
                 name: "武僧马嘉祺",
                 avatar: "/static/image/menu/majiaqi.jpg",
                 skills: [
-                    { name: "冲锋", desc: "快速冲向敌人并造成眩晕" },
-                    { name: "旋风斩", desc: "旋转攻击周围所有敌人" },
-                    { name: "斩杀", desc: "对低血量敌人造成真实伤害" }
+                    { name: "冲锋", desc: "快速冲向敌人并造成眩晕", class: Blink },
+                    { name: "旋风斩", desc: "旋转攻击周围所有敌人", class: Whirlwind },
+                    { name: "斩杀", desc: "对低血量敌人造成真实伤害", class: Execute }
                 ]
             },
             {
@@ -17,9 +18,9 @@ class AcHeroSelect {
                 name: "邪恶小明睿",
                 avatar: "/static/image/menu/mingrui.jpg",
                 skills: [
-                    { name: "火球术", desc: "发射火球造成范围伤害" },
-                    { name: "冰霜新星", desc: "冻结周围敌人并减速" },
-                    { name: "闪现", desc: "瞬间位移到指定位置" }
+                    { name: "火球术", desc: "发射火球造成范围伤害", class: FireBall },
+                    { name: "冰霜新星", desc: "冻结周围敌人并减速", class: FrostNova },
+                    { name: "闪现", desc: "瞬间位移到指定位置", class: Blink }
                 ]
             },
             {
@@ -27,19 +28,20 @@ class AcHeroSelect {
                 name: "老炮手佳批",
                 avatar: "/static/image/menu/chengjia.jpg",
                 skills: [
-                    { name: "精准射击", desc: "对单个目标造成高额伤害" },
-                    { name: "箭雨", desc: "向空中射出大量箭矢造成范围伤害" },
-                    { name: "闪避", desc: "短暂免疫伤害并向后位移" }
+                    { name: "精准射击", desc: "对单个目标造成高额伤害", class: FireBall },
+                    { name: "箭雨", desc: "向空中射出大量箭矢造成范围伤害", class: ArrowRain },
+                    { name: "闪避", desc: "短暂免疫伤害并向后位移", class: Blink }
                 ]
             }
         ];
+
         this.current_idx = 0;
+
         this.$hero_select = $(`
             <div class="ac-game-hero-total">
                 <div class="ac-game-hero-select">
                     <div class="ac-game-hero-select-title">选择你的英雄</div>
                     
-                    <!-- 英雄名字 动态显示 -->
                     <div class="ac-game-hero-name"></div>
     
                     <div class="ac-game-hero-select-container">
@@ -53,6 +55,7 @@ class AcHeroSelect {
                 </div>
             </div>
         `);
+
         this.$hero_select.hide();
         this.root.$ac_game.append(this.$hero_select);
 
@@ -60,7 +63,7 @@ class AcHeroSelect {
         this.$arrow_left = this.$hero_select.find('.ac-game-hero-select-arrow-left');
         this.$arrow_right = this.$hero_select.find('.ac-game-hero-select-arrow-right');
         this.$hero_image = this.$hero_select.find('.ac-game-hero-select-image');
-        this.$hero_name = this.$hero_select.find('.ac-game-hero-name'); // 英雄名字
+        this.$hero_name = this.$hero_select.find('.ac-game-hero-name');
         this.$skills_container = this.$hero_select.find('.ac-game-hero-select-skills');
 
         this.start();
@@ -71,21 +74,17 @@ class AcHeroSelect {
         this.add_listening_events();
     }
 
-    // 渲染：头像 + 名字 + 技能
     render() {
         const hero = this.heroes[this.current_idx];
 
-        // 1. 更新头像
         this.$hero_image.css({
             "background-image": `url(${hero.avatar})`,
             "background-size": "cover",
             "background-position": "center"
         });
 
-        // 2. ✅ 更新英雄名字
         this.$hero_name.text(hero.name);
 
-        // 3. 更新技能
         let skills_html = "";
         for (let skill of hero.skills) {
             skills_html += `
@@ -101,25 +100,29 @@ class AcHeroSelect {
     add_listening_events() {
         let outer = this;
 
-        // 确定
-        this.$confirm_btn.click(function() {
+        this.$confirm_btn.click(function () {
             outer.hide();
+
+            // ⭐ 关键：传整个 hero（带 class）
             outer.root.playground.show("single mode", outer.heroes[outer.current_idx]);
         });
 
-        // 左箭头
-        this.$arrow_left.click(function() {
+        this.$arrow_left.click(function () {
             outer.current_idx = (outer.current_idx - 1 + outer.heroes.length) % outer.heroes.length;
             outer.render();
         });
 
-        // 右箭头
-        this.$arrow_right.click(function() {
+        this.$arrow_right.click(function () {
             outer.current_idx = (outer.current_idx + 1) % outer.heroes.length;
             outer.render();
         });
     }
 
-    show() { this.$hero_select.show(); }
-    hide() { this.$hero_select.hide(); }
+    show() {
+        this.$hero_select.show();
+    }
+
+    hide() {
+        this.$hero_select.hide();
+    }
 }
