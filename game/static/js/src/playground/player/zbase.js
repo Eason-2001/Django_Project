@@ -16,27 +16,13 @@ class Player extends AcGameObject {
         this.radius = radius;
         this.color = color;
         this.speed = speed;
+        this.max_hp = 100;
+        this.hp = 100;
 
         this.character = character;
         this.username = username;
 
-        // ⭐ 1. 机器人随机头像系统
-        this.robot_photos = [
-            "/static/image/avatar/robot1.png",
-            "/static/image/avatar/robot2.png",
-            "/static/image/avatar/robot3.png",
-            "/static/image/avatar/robot4.png",
-            "/static/image/avatar/robot5.png"
-        ];
-
-        // ⭐ 2. 如果是机器人，覆盖传入的 photo，随机选一个
-        if (this.character === "robot") {
-            // 随机生成 0~4 的整数作为索引
-            let idx = Math.floor(Math.random() * this.robot_photos.length);
-            this.photo = this.robot_photos[idx];
-        } else {
-            this.photo = photo; // 玩家或NPC使用传入的头像
-        }
+        this.photo = photo;
 
         this.mouse_x = this.x;
         this.mouse_y = this.y;
@@ -250,6 +236,21 @@ class Player extends AcGameObject {
             ctx.fillStyle = this.color;
             ctx.fill();
         }
+
+        // ⭐ 血条
+        let bar_width = this.radius * 2;
+        let bar_height = 5;
+
+        this.ctx.fillStyle = "red";
+        this.ctx.fillRect(pos.x - this.radius, pos.y - this.radius - 10, bar_width, bar_height);
+
+        this.ctx.fillStyle = "green";
+        this.ctx.fillRect(
+            pos.x - this.radius,
+            pos.y - this.radius - 10,
+            bar_width * (this.hp / this.max_hp),
+            bar_height
+        );
     }
 
     get_dist(x1, y1, x2, y2) {
@@ -261,33 +262,12 @@ class Player extends AcGameObject {
     is_attacked(angle, damage) {
         if (this.invincible) return;
 
-        console.log("受到伤害:", damage);
+        this.hp -= damage;
 
-        // ✅ 半径变小 = 血量
-        this.radius -= damage * 0.3;
-        ;
-
-        // ✅ 击退
         this.x += Math.cos(angle) * damage * 0.5;
         this.y += Math.sin(angle) * damage * 0.5;
 
-        // ✅ 粒子特效
-        for (let i = 0; i < 10; i++) {
-            new Particle(
-                this.playground,
-                this.x,
-                this.y,
-                Math.random() * 5,
-                Math.cos(angle + Math.random()),
-                Math.sin(angle + Math.random()),
-                this.color,
-                Math.random() * 200,
-                Math.random() * 50
-            );
-        }
-
-        // 💀 死亡判定
-        if (this.radius <= 0) {
+        if (this.hp <= 0) {
             this.destroy();
         }
     }

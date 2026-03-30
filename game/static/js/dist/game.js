@@ -593,39 +593,42 @@ class Particle extends AcGameObject {
     }
 }
 class Player extends AcGameObject {
-    // Player.js
     constructor(playground, x, y, radius, color, speed, character, username, photo, hero) {
         super();
+
         this.playground = playground;
         this.hero = hero;
         this.ctx = this.playground.game_map.ctx;
 
         this.x = x;
         this.y = y;
+
+        this.vx = 0;
+        this.vy = 0;
+        this.move_length = 0;
+
         this.radius = radius;
         this.color = color;
         this.speed = speed;
+
         this.character = character;
+        this.username = username;
 
-        // ⭐ 修改点：如果是机器人且传入了英雄对象，直接继承该英雄的属性
-        if (this.character === "robot" && this.hero) {
-            this.username = this.hero.name; // Bot 名字显示为英雄名
-            this.photo = this.hero.avatar;  // Bot 头像使用英雄头像
-        } else {
-            this.username = username;
-            this.photo = photo;
-        }
+        this.photo = photo;
 
-        // 统一图片加载逻辑（不需要改动，保持你原来的即可）
+        this.mouse_x = this.x;
+        this.mouse_y = this.y;
+
+        // ⭐ 3. 统一创建 Image 对象，不论是谁
         this.img = new Image();
         this.img.src = this.photo;
+
+        // 增加一个标记，确保图片加载完再画
         this.img_loaded = false;
         let outer = this;
         this.img.onload = function () {
             outer.img_loaded = true;
         }
-
-        // ... 其他初始化代码 (mouse_x, vx, vy 等)
     }
 
     start() {
@@ -1012,7 +1015,7 @@ class Player extends AcGameObject {
         }
     }
 }
-class ArrowRain extends AcGameObject {
+export class ArrowRain extends AcGameObject {
     constructor(playground, player, tx, ty, damage) {
         super();
         this.playground = playground;
@@ -1046,7 +1049,7 @@ class ArrowRain extends AcGameObject {
             }
         }
     }
-}class Blink extends AcGameObject {
+}export class Blink extends AcGameObject {
     constructor(playground, player, tx, ty, stun = false, invincible = false) {
         super();
         this.playground = playground;
@@ -1074,10 +1077,14 @@ class ArrowRain extends AcGameObject {
         p.x += Math.cos(angle) * dist;
         p.y += Math.sin(angle) * dist;
 
+        // ⭐ 关键：不要设置 p.move_length = 0!
+        // 这样闪现完后，如果之前有移动目标，玩家会继续向原目标丝滑滑行。
+
+        // 如果你希望闪现完依然有惯性，可以保留当前的 vx, vy
 
         this.destroy();
     }
-}class Execute extends AcGameObject {
+}export class Execute extends AcGameObject {
     constructor(playground, player, damage) {
         super();
         this.playground = playground;
@@ -1102,7 +1109,7 @@ class ArrowRain extends AcGameObject {
 
         this.destroy();
     }
-}class FireBall extends AcGameObject {
+}export class FireBall extends AcGameObject {
     constructor(playground, player, x, y, radius, vx, vy, color, speed, move_length, damage) {
         super();
 
@@ -1175,7 +1182,7 @@ class ArrowRain extends AcGameObject {
         this.ctx.fillStyle = this.color;
         this.ctx.fill();
     }
-}class FrostNova extends AcGameObject {
+}export class FrostNova extends AcGameObject {
     constructor(playground, player, damage) {
         super();
         this.playground = playground;
@@ -1203,7 +1210,7 @@ class ArrowRain extends AcGameObject {
 
         this.destroy();
     }
-}class Whirlwind extends AcGameObject {
+}export class Whirlwind extends AcGameObject {
     constructor(playground, player, damage) {
         super();
 
@@ -1429,60 +1436,61 @@ class AcGamePlayground {
     }
 
     show(mode, hero) {
-    this.$playground.show();
-    this.width = this.$playground.width();
-    this.height = this.$playground.height();
-    this.resize();
-    this.game_map = new GameMap(this);
-    this.mini_map = new MiniMap(this);
+        this.$playground.show();
+        this.width = this.$playground.width();
+        this.height = this.$playground.height();
+        this.resize();
+        this.game_map = new GameMap(this);
 
-    this.hero_list = this.root.hero.heroes; // 获取英雄池
-    this.hero = hero;                       // 玩家选中的英雄
-    this.scale = this.height / 1080;
+        this.mini_map = new MiniMap(this);
+        this.hero_list = this.root.hero.heroes;
+        this.hero = hero;
+        this.scale = this.height / 1080;
 
-    this.mode = mode;
-    this.state = "waiting";
-    this.player_count = 0;
+        this.mode = mode;
+        this.state = "waiting";
+        this.player_count = 0;
 
-    this.players = [];
+        this.players = [];
 
-    // 1. 生成主角（玩家自己）
-    this.players.push(
-        new Player(
-            this,
-            this.game_map.map_width / 2,
-            this.game_map.map_height / 2,
-            50,
-            "white",
-            300,
-            "me",
-            this.hero.name,
-            this.hero.avatar,
-            this.hero
-        )
-    );
-
-    // 2. ⭐ 生成 5 个随机类型的 Bot
-    for (let i = 0; i < 5; i++) {
-        // 每一轮循环都随机抽一个英雄配置
-        let random_hero = this.hero_list[Math.floor(Math.random() * this.hero_list.length)];
-
+        // 主角（世界中心）
         this.players.push(
             new Player(
                 this,
-                Math.random() * this.game_map.map_width,  // 随机出生 X
-                Math.random() * this.game_map.map_height, // 随机出生 Y
+                this.game_map.map_width / 2,
+                this.game_map.map_height / 2,
                 50,
                 "white",
-                200,                                      // Bot 速度稍慢一点
-                "robot",
-                random_hero.name,                         // Bot 名字
-                random_hero.avatar,                       // Bot 头像
-                random_hero                               // ⭐ 传入随机英雄对象
+                300,
+                "me",
+                this.hero.name,
+                this.hero.avatar,   // ⭐用英雄头像
+                this.hero           // ⭐把整个英雄传进去
             )
         );
+
+        // 机器人
+        for (let i = 0; i < 5; i++) {
+
+            // ⭐ 随机选一个英雄
+            let hero = this.hero_list[Math.floor(Math.random() * this.hero_list.length)];
+
+            this.players.push(
+                new Player(
+                    this,
+                    Math.random() * this.game_map.map_width,
+                    Math.random() * this.game_map.map_height,
+                    50,
+                    "red",
+                    200,
+                    "robot",
+                    hero.name,
+                    hero.avatar,
+                    hero   // ⭐ 给AI也传hero！
+                )
+            );
+        }
     }
-}
 
     hide() {
         this.$playground.empty();
