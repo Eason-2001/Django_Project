@@ -3,33 +3,45 @@ export class Blink extends AcGameObject {
         super();
         this.playground = playground;
         this.player = player;
-
         this.tx = tx;
         this.ty = ty;
-
-        this.max_dist = 400; // 最大闪现距离（像素）
+        this.max_dist = 800; // 大幅增加闪现距离，解决放不出来问题
         this.stun = stun;
         this.invincible = invincible;
     }
 
     start() {
         const p = this.player;
-
         let dx = this.tx - p.x;
         let dy = this.ty - p.y;
         let dist = Math.sqrt(dx * dx + dy * dy);
-
         dist = Math.min(dist, this.max_dist);
         const angle = Math.atan2(dy, dx);
 
-        // 瞬间改变坐标
+        // 位移
         p.x += Math.cos(angle) * dist;
         p.y += Math.sin(angle) * dist;
 
-        // ⭐ 关键：不要设置 p.move_length = 0!
-        // 这样闪现完后，如果之前有移动目标，玩家会继续向原目标丝滑滑行。
+        // ⭐ 冲锋：眩晕敌人
+        if (this.stun) {
+            for (let t of this.playground.players) {
+                if (t !== p && p.get_dist(p.x, p.y, t.x, t.y) < 200) {
+                    t.speed = 0;
+                    setTimeout(() => t.speed = 300, 1000); // 晕1秒
+                }
+            }
+        }
 
-        // 如果你希望闪现完依然有惯性，可以保留当前的 vx, vy
+        // ⭐ 闪避：无敌
+        if (this.invincible) {
+            p.invincible = true;
+            setTimeout(() => p.invincible = false, 500); // 0.5秒免伤
+        }
+
+        // 粒子特效
+        for (let i = 0; i < 10; i++) {
+            new Particle(this.playground, p.x, p.y, 3, Math.random()*2-1, Math.random()*2-1, "cyan", 200, 30);
+        }
 
         this.destroy();
     }

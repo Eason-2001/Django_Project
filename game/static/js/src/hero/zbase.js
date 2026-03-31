@@ -7,30 +7,126 @@ class AcHeroSelect {
                 id: 1,
                 name: "武僧马嘉祺",
                 avatar: "/static/image/menu/majiaqi.jpg",
+                desc: "近战控制型战士",
                 skills: [
-                    { name: "冲锋", desc: "快速冲向敌人并造成眩晕", class: Blink },
-                    { name: "旋风斩", desc: "旋转攻击周围所有敌人", class: Whirlwind },
-                    { name: "斩杀", desc: "对低血量敌人造成真实伤害", class: Execute }
+                    {
+                        key: "Q",
+                        name: "冲锋",
+                        desc: "快速冲向敌人并造成眩晕",
+                        icon: "/static/image/skills/blink.png",
+                        class: Blink,
+                        damage: 10,
+                        cooldown: 5,
+                        range: 0.8,
+                        type: "control"
+                    },
+                    {
+                        key: "W",
+                        name: "旋风斩",
+                        desc: "旋转攻击周围所有敌人",
+                        icon: "/static/image/skills/whirlwind.png",
+                        class: Whirlwind,
+                        damage: 25,
+                        cooldown: 6,
+                        range: 0.5,
+                        type: "aoe"
+                    },
+                    {
+                        key: "E",
+                        name: "斩杀",
+                        desc: "对低血量敌人造成真实伤害",
+                        icon: "/static/image/skills/execute.png",
+                        class: Execute,
+                        damage: 40,
+                        cooldown: 8,
+                        range: 0.6,
+                        type: "execute"
+                    }
                 ]
             },
+
             {
                 id: 2,
                 name: "邪恶小明睿",
                 avatar: "/static/image/menu/mingrui.jpg",
+                desc: "远程法师",
                 skills: [
-                    { name: "火球术", desc: "发射火球造成范围伤害", class: FireBall },
-                    { name: "冰霜新星", desc: "冻结周围敌人并减速", class: FrostNova },
-                    { name: "闪现", desc: "瞬间位移到指定位置", class: Blink }
+                    {
+                        key: "Q",
+                        name: "火球术",
+                        desc: "发射火球造成范围伤害",
+                        icon: "/static/image/skills/fireball.png",
+                        class: FireBall,
+                        damage: 30,
+                        cooldown: 3,
+                        speed: 0.7,
+                        range: 1.2,
+                        type: "skillshot"
+                    },
+                    {
+                        key: "W",
+                        name: "冰霜新星",
+                        desc: "冻结周围敌人并减速",
+                        icon: "/static/image/skills/frost.png",
+                        class: FrostNova,
+                        damage: 15,
+                        cooldown: 6,
+                        range: 0.6,
+                        type: "aoe_control"
+                    },
+                    {
+                        key: "E",
+                        name: "闪现",
+                        desc: "瞬间位移到指定位置",
+                        icon: "/static/image/skills/blink.png",
+                        class: Blink,
+                        damage: 0,
+                        cooldown: 8,
+                        range: 0.8,
+                        type: "movement"
+                    }
                 ]
             },
+
             {
                 id: 3,
                 name: "老炮手佳批",
                 avatar: "/static/image/menu/chengjia.jpg",
+                desc: "远程爆发射手",
                 skills: [
-                    { name: "精准射击", desc: "对单个目标造成高额伤害", class: FireBall },
-                    { name: "箭雨", desc: "向空中射出大量箭矢造成范围伤害", class: ArrowRain },
-                    { name: "闪避", desc: "短暂免疫伤害并向后位移", class: Blink }
+                    {
+                        key: "Q",
+                        name: "精准射击",
+                        desc: "对单个目标造成高额伤害",
+                        icon: "/static/image/skills/sniper.png",
+                        class: FireBall,
+                        damage: 45,
+                        cooldown: 4,
+                        range: 1.5,
+                        type: "single"
+                    },
+                    {
+                        key: "W",
+                        name: "箭雨",
+                        desc: "范围持续伤害",
+                        icon: "/static/image/skills/rain.png",
+                        class: ArrowRain,
+                        damage: 20,
+                        cooldown: 7,
+                        range: 1.0,
+                        type: "aoe"
+                    },
+                    {
+                        key: "E",
+                        name: "闪避",
+                        desc: "免疫伤害并位移",
+                        icon: "/static/image/skills/dodge.png",
+                        class: Blink,
+                        damage: 0,
+                        cooldown: 6,
+                        range: 0.7,
+                        type: "defense"
+                    }
                 ]
             }
         ];

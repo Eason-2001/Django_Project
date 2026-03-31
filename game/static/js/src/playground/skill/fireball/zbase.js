@@ -57,6 +57,19 @@ export class FireBall extends AcGameObject {
     }
 
     attack(p) {
+        for (let i = 0; i < 15; i++) {
+            new Particle(
+                this.playground,
+                p.x,
+                p.y,
+                Math.random() * 5,
+                Math.cos(Math.random() * 2 * Math.PI),
+                Math.sin(Math.random() * 2 * Math.PI),
+                "orange",
+                300,
+                50
+            );
+        }
         let angle = Math.atan2(p.y - this.y, p.x - this.x);
         p.is_attacked(angle, this.damage);
         this.destroy();

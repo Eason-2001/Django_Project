@@ -25,61 +25,69 @@ class AcGamePlayground {
     }
 
     show(mode, hero) {
-        this.$playground.show();
-        this.width = this.$playground.width();
-        this.height = this.$playground.height();
-        this.resize();
-        this.game_map = new GameMap(this);
+    this.$playground.show();
 
-        this.mini_map = new MiniMap(this);
-        this.hero_list = this.root.hero.heroes;
-        this.hero = hero;
-        this.scale = this.height / 1080;
+    this.width = this.$playground.width();
+    this.height = this.$playground.height();
+    this.resize();
 
-        this.mode = mode;
-        this.state = "waiting";
-        this.player_count = 0;
+    this.scale = this.height / 1080;
 
-        this.players = [];
+    this.mode = mode;
+    this.state = "waiting";
 
-        // 主角（世界中心）
+    // ⭐ 1. 先初始化数据
+    this.player_count = 0;
+    this.players = [];
+
+    // ⭐ 2. 先保存 hero
+    this.hero = hero;
+
+    // ⭐ 3. 再创建地图（会立刻进入 update）
+    this.game_map = new GameMap(this);
+
+    // ⭐ 4. UI
+    this.mini_map = new MiniMap(this);
+    this.skill_ui = new SkillUI(this);
+
+    this.hero_list = this.root.hero.heroes;
+
+    // ⭐ 5. 创建玩家
+    this.players.push(
+        new Player(
+            this,
+            this.game_map.map_width / 2,
+            this.game_map.map_height / 2,
+            50,
+            "white",
+            300,
+            "me",
+            this.hero.name,
+            this.hero.avatar,
+            this.hero
+        )
+    );
+
+    // ⭐ 6. AI
+    for (let i = 0; i < 5; i++) {
+        let hero = this.hero_list[Math.floor(Math.random() * this.hero_list.length)];
+
         this.players.push(
             new Player(
                 this,
-                this.game_map.map_width / 2,
-                this.game_map.map_height / 2,
+                Math.random() * this.game_map.map_width,
+                Math.random() * this.game_map.map_height,
                 50,
-                "white",
-                300,
-                "me",
-                this.hero.name,
-                this.hero.avatar,   // ⭐用英雄头像
-                this.hero           // ⭐把整个英雄传进去
+                "red",
+                200,
+                "robot",
+                hero.name,
+                hero.avatar,
+                hero
             )
         );
-
-        // 机器人
-        for (let i = 0; i < 5; i++) {
-
-            // ⭐ 随机选一个英雄
-            let hero = this.hero_list[Math.floor(Math.random() * this.hero_list.length)];
-
-            this.players.push(
-                new Player(
-                    this,
-                    Math.random() * this.game_map.map_width,
-                    Math.random() * this.game_map.map_height,
-                    50,
-                    "red",
-                    200,
-                    "robot",
-                    hero.name,
-                    hero.avatar,
-                    hero   // ⭐ 给AI也传hero！
-                )
-            );
-        }
     }
+}
 
     hide() {
         this.$playground.empty();

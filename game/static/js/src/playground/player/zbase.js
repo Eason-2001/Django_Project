@@ -16,13 +16,15 @@ class Player extends AcGameObject {
         this.radius = radius;
         this.color = color;
         this.speed = speed;
-        this.max_hp = 100;
-        this.hp = 100;
+        this.max_hp = 550;
+        this.hp = 550;
 
         this.character = character;
         this.username = username;
 
+        this.invincible = false;
         this.photo = photo;
+        this.skill_cds = {};  // 技能冷却表
 
         this.mouse_x = this.x;
         this.mouse_y = this.y;
@@ -113,46 +115,72 @@ class Player extends AcGameObject {
     }
 
     // 🔥 核心：技能释放系统
-    cast_skill(skill) {
-        if (!skill || !skill.class) return;
+    // 🔥 核心：技能释放系统（已修复所有BUG）
+    // 🔥 最终修复版：技能释放系统
+cast_skill(skill) {
+    if (!skill || !skill.class) return;
 
-        console.log("释放技能:", skill.name);
+    let now = Date.now();
+    // 冷却判断
+    if (this.skill_cds[skill.name] && now < this.skill_cds[skill.name]) {
+        return;
+    }
+    this.skill_cds[skill.name] = now + skill.cooldown * 1000;
 
-        let tx = this.mouse_x;
-        let ty = this.mouse_y;
+    let tx = this.mouse_x;
+    let ty = this.mouse_y;
+    let dx = tx - this.x;
+    let dy = ty - this.y;
+    let dist = Math.sqrt(dx * dx + dy * dy);
 
-        // ⭐ 统一用 class 创建技能
-        if (skill.class === FireBall) {
-            let dx = tx - this.x;
-            let dy = ty - this.y;
-            let angle = Math.atan2(dy, dx);
+    // ⭐ 修复1：range 单位换算（配置是比例，转成像素）
+    const RANGE_SCALE = 1000;
+    let real_range = skill.range * RANGE_SCALE;
 
-            new FireBall(
-                this.playground,
-                this,
-                this.x,
-                this.y,
-                10,
-                Math.cos(angle),
-                Math.sin(angle),
-                "orange",
-                500,
-                1000,
-                10
-            );
-        } else if (skill.class === Blink) {
-            new Blink(this.playground, this, tx, ty);
-        } else if (skill.class === ArrowRain) {
-            new ArrowRain(this.playground, this, tx, ty, 20);
-        } else if (skill.class === FrostNova) {
-            new FrostNova(this.playground, this, 15);
-        } else if (skill.class === Whirlwind) {
-            new Whirlwind(this.playground, this, 10);
-        } else if (skill.class === Execute) {
-            new Execute(this.playground, this, 30);
-        }
+    // ⭐ 修复2：只有攻击技能限制距离，位移技能不限制
+    if (skill.type !== "movement" && skill.type !== "defense" && skill.type !== "control" && dist > real_range) {
+        tx = this.x + dx / dist * real_range;
+        ty = this.y + dy / dist * real_range;
     }
 
+    // === 所有技能释放逻辑 ===
+    // 火球/精准射击
+    if (skill.class === FireBall) {
+        let angle = Math.atan2(dy, dx);
+        new FireBall(
+            this.playground, this, this.x, this.y, 10,
+            Math.cos(angle), Math.sin(angle), "orange",
+            500, real_range, skill.damage
+        );
+    }
+
+    // 闪现/冲锋/闪避（全修复）
+    if (skill.class === Blink) {
+        let stun = skill.type === "control"; // 冲锋=眩晕
+        let invincible = skill.type === "defense"; // 闪避=无敌
+        new Blink(this.playground, this, tx, ty, stun, invincible);
+    }
+
+    // 冰霜新星
+    if (skill.class === FrostNova) {
+        new FrostNova(this.playground, this, skill.damage);
+    }
+
+    // 旋风斩
+    if (skill.class === Whirlwind) {
+        new Whirlwind(this.playground, this, skill.damage);
+    }
+
+    // 斩杀
+    if (skill.class === Execute) {
+        new Execute(this.playground, this, skill.damage);
+    }
+
+    // 箭雨
+    if (skill.class === ArrowRain) {
+        new ArrowRain(this.playground, this, tx, ty, skill.damage);
+    }
+}
     move_to(tx, ty) {
         const dx = tx - this.x;
         const dy = ty - this.y;
@@ -214,15 +242,14 @@ class Player extends AcGameObject {
 
         const pos = gm.map_to_viewport(this.x, this.y);
 
+        ctx.save();
+
+        // ⭐ 圆形裁剪
         ctx.beginPath();
         ctx.arc(pos.x, pos.y, this.radius, 0, Math.PI * 2);
+        ctx.clip();
 
-        // ⭐ 4. 统一改为图片圆柱剪裁绘制
         if (this.img_loaded) {
-            ctx.save();
-            ctx.clip(); // 将当前的圆形路径设为剪裁区域
-
-            // 绘制图片，使其中心对准玩家坐标，大小刚好覆盖圆形
             ctx.drawImage(
                 this.img,
                 pos.x - this.radius,
@@ -230,26 +257,23 @@ class Player extends AcGameObject {
                 this.radius * 2,
                 this.radius * 2
             );
-            ctx.restore(); // 恢复剪裁之前的状态，防止影响后续绘制
         } else {
-            // 如果图片还没加载完，先画个底色垫着
             ctx.fillStyle = this.color;
             ctx.fill();
         }
 
+        ctx.restore();
+
         // ⭐ 血条
-        let bar_width = this.radius * 2;
-        let bar_height = 5;
+        ctx.fillStyle = "red";
+        ctx.fillRect(pos.x - this.radius, pos.y - this.radius - 10, this.radius * 2, 5);
 
-        this.ctx.fillStyle = "red";
-        this.ctx.fillRect(pos.x - this.radius, pos.y - this.radius - 10, bar_width, bar_height);
-
-        this.ctx.fillStyle = "green";
-        this.ctx.fillRect(
+        ctx.fillStyle = "green";
+        ctx.fillRect(
             pos.x - this.radius,
             pos.y - this.radius - 10,
-            bar_width * (this.hp / this.max_hp),
-            bar_height
+            this.radius * 2 * (this.hp / this.max_hp),
+            5
         );
     }
 
@@ -266,7 +290,8 @@ class Player extends AcGameObject {
 
         this.x += Math.cos(angle) * damage * 0.5;
         this.y += Math.sin(angle) * damage * 0.5;
-
+        this.playground.game_map.viewport_x += Math.random() * 10 - 5;
+        this.playground.game_map.viewport_y += Math.random() * 10 - 5;
         if (this.hp <= 0) {
             this.destroy();
         }
