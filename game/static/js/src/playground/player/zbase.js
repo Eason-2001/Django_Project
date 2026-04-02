@@ -16,8 +16,8 @@ class Player extends AcGameObject {
         this.radius = radius;
         this.color = color;
         this.speed = speed;
-        this.max_hp = 550;
-        this.hp = 550;
+        this.max_hp = 300;
+        this.hp = 300;
 
         this.character = character;
         this.username = username;

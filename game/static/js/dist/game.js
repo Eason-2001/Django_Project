@@ -121,7 +121,7 @@ class AcHeroSelect {
                         key: "E",
                         name: "闪避",
                         desc: "免疫伤害并位移",
-                        icon: "/static/image/skills/dodge.png",
+                        icon: "/static/image/skills/blink.png",
                         class: Blink,
                         damage: 0,
                         cooldown: 6,
@@ -172,27 +172,30 @@ class AcHeroSelect {
     }
 
     render() {
-        const hero = this.heroes[this.current_idx];
+    const hero = this.heroes[this.current_idx];
 
-        this.$hero_image.css({
-            "background-image": `url(${hero.avatar})`,
-            "background-size": "cover",
-            "background-position": "center"
-        });
+    this.$hero_image.css({
+        "background-image": `url(${hero.avatar})`,
+        "background-size": "cover",
+        "background-position": "center"
+    });
 
-        this.$hero_name.text(hero.name);
+    this.$hero_name.text(hero.name);
 
-        let skills_html = "";
-        for (let skill of hero.skills) {
-            skills_html += `
-                <div class="ac-game-hero-skill">
-                    <div class="ac-game-hero-skill-name">${skill.name}</div>
+    let skills_html = "";
+    for (let skill of hero.skills) {
+        skills_html += `
+            <div class="ac-game-hero-skill">
+                <img src="${skill.icon}" class="ac-game-hero-skill-icon">
+                <div class="ac-game-hero-skill-info">
+                    <div class="ac-game-hero-skill-name">${skill.key} - ${skill.name}</div>
                     <div class="ac-game-hero-skill-desc">${skill.desc}</div>
                 </div>
-            `;
-        }
-        this.$skills_container.html(skills_html);
+            </div>
+        `;
     }
+    this.$skills_container.html(skills_html);
+}
 
     add_listening_events() {
         let outer = this;
@@ -706,8 +709,8 @@ class Player extends AcGameObject {
         this.radius = radius;
         this.color = color;
         this.speed = speed;
-        this.max_hp = 100;
-        this.hp = 100;
+        this.max_hp = 300;
+        this.hp = 300;
 
         this.character = character;
         this.username = username;
@@ -1144,27 +1147,24 @@ export class ArrowRain extends AcGameObject {
         this.radius = 200;
         this.duration = 400;
         this.elapsed = 0;
-
-        // 记录这波箭雨已经打到谁，防止重复伤害
-        this.hit = new Set();
+        this.has_hit = false;
     }
 
     update() {
         this.elapsed += this.timedelta;
-
         if (this.elapsed > this.duration) {
             this.destroy();
             return;
         }
 
-        for (let p of this.playground.players) {
-            if (p === this.player) continue;
-            if (this.hit.has(p)) continue; // 每个人只中一次
-
-            let dist = Math.hypot(p.x - this.tx, p.y - this.ty);
-            if (dist < this.radius) {
-                this.hit.add(p); // 标记已击中
-                p.is_attacked(Math.random() * Math.PI * 2, this.damage);
+        if (!this.has_hit) {
+            this.has_hit = true;
+            for (let p of this.playground.players) {
+                if (p === this.player) continue;
+                let dist = Math.hypot(p.x - this.tx, p.y - this.ty);
+                if (dist < this.radius) {
+                    p.is_attacked(Math.random() * Math.PI * 2, this.damage);
+                }
             }
         }
     }
@@ -1225,19 +1225,17 @@ export class ArrowRain extends AcGameObject {
 
     start() {
         const p = this.player;
-
         for (let t of this.playground.players) {
             if (t !== p) {
                 let dist = p.get_dist(p.x, p.y, t.x, t.y);
-
                 if (dist < 150) {
-                    let real_damage = this.damage * (2 - t.radius / 50);
+                    // 固定40伤害，不再爆炸
+                    let real_damage = this.damage;
                     let angle = Math.atan2(t.y - p.y, t.x - p.x);
                     t.is_attacked(angle, real_damage);
                 }
             }
         }
-
         this.destroy();
     }
 }export class FireBall extends AcGameObject {
@@ -1389,19 +1387,16 @@ export class ArrowRain extends AcGameObject {
 }export class Whirlwind extends AcGameObject {
     constructor(playground, player, damage) {
         super();
-
         this.playground = playground;
         this.player = player;
         this.damage = damage;
-
-        this.duration = 300; // ms
+        this.duration = 300;
         this.elapsed = 0;
-        this.has_damaged = false; // 👈 加个标记，只打一次
+        this.has_hit = false;
     }
 
     update() {
         this.elapsed += this.timedelta;
-
         if (this.elapsed > this.duration) {
             this.destroy();
             return;
@@ -1409,20 +1404,16 @@ export class ArrowRain extends AcGameObject {
 
         const p = this.player;
         let pos = this.playground.game_map.map_to_viewport(p.x, p.y);
-
         this.playground.game_map.ctx.beginPath();
         this.playground.game_map.ctx.arc(pos.x, pos.y, 180, 0, Math.PI * 2);
         this.playground.game_map.ctx.strokeStyle = "rgba(255,255,255,0.3)";
         this.playground.game_map.ctx.stroke();
 
-        // 👇 只在第一次执行伤害！！！
-        if (!this.has_damaged) {
-            this.has_damaged = true; // 只打一次
-
+        if (!this.has_hit) {
+            this.has_hit = true;
             for (let t of this.playground.players) {
                 if (t !== p) {
                     let dist = p.get_dist(p.x, p.y, t.x, t.y);
-
                     if (dist < 180) {
                         t.is_attacked(Math.random() * Math.PI * 2, this.damage);
                     }
@@ -1430,8 +1421,7 @@ export class ArrowRain extends AcGameObject {
             }
         }
     }
-}// 继承 AcGameObject，加入游戏主循环，每帧自动更新！
-class SkillUI extends AcGameObject {
+}class SkillUI extends AcGameObject {
     constructor(playground) {
         super(); // 必须加！启用主循环
         this.playground = playground;
@@ -1441,20 +1431,20 @@ class SkillUI extends AcGameObject {
     }
 
     render() {
-        let hero = this.playground.hero;
-        let html = "";
-        for (let i = 0; i < hero.skills.length; i++) {
-            let skill = hero.skills[i];
-            html += `
-                <div class="skill-item">
-                    <div class="skill-key">${['Q', 'W', 'E'][i]}</div>
-                    <div class="skill-name">${skill.name}</div>
-                    <div class="skill-cd-mask"></div> 
-                </div>
-            `;
-        }
-        this.$container.html(html);
+    let hero = this.playground.hero;
+    let html = "";
+    for (let i = 0; i < hero.skills.length; i++) {
+        let skill = hero.skills[i];
+        html += `
+            <div class="skill-item">
+                <img src="${skill.icon}" class="skill-item-icon">
+                <div class="skill-key">${['Q', 'W', 'E'][i]}</div>
+                <div class="skill-cd-mask"></div>
+            </div>
+        `;
     }
+    this.$container.html(html);
+}
 
     // 🔥 核心：每帧自动执行，冷却遮罩实时更新
     update() {

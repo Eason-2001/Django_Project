@@ -1,4 +1,3 @@
-// 继承 AcGameObject，加入游戏主循环，每帧自动更新！
 class SkillUI extends AcGameObject {
     constructor(playground) {
         super(); // 必须加！启用主循环
@@ -9,20 +8,20 @@ class SkillUI extends AcGameObject {
     }
 
     render() {
-        let hero = this.playground.hero;
-        let html = "";
-        for (let i = 0; i < hero.skills.length; i++) {
-            let skill = hero.skills[i];
-            html += `
-                <div class="skill-item">
-                    <div class="skill-key">${['Q', 'W', 'E'][i]}</div>
-                    <div class="skill-name">${skill.name}</div>
-                    <div class="skill-cd-mask"></div> 
-                </div>
-            `;
-        }
-        this.$container.html(html);
+    let hero = this.playground.hero;
+    let html = "";
+    for (let i = 0; i < hero.skills.length; i++) {
+        let skill = hero.skills[i];
+        html += `
+            <div class="skill-item">
+                <img src="${skill.icon}" class="skill-item-icon">
+                <div class="skill-key">${['Q', 'W', 'E'][i]}</div>
+                <div class="skill-cd-mask"></div>
+            </div>
+        `;
     }
+    this.$container.html(html);
+}
 
     // 🔥 核心：每帧自动执行，冷却遮罩实时更新
     update() {

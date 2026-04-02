@@ -120,7 +120,7 @@ class AcHeroSelect {
                         key: "E",
                         name: "闪避",
                         desc: "免疫伤害并位移",
-                        icon: "/static/image/skills/dodge.png",
+                        icon: "/static/image/skills/blink.png",
                         class: Blink,
                         damage: 0,
                         cooldown: 6,
@@ -171,27 +171,30 @@ class AcHeroSelect {
     }
 
     render() {
-        const hero = this.heroes[this.current_idx];
+    const hero = this.heroes[this.current_idx];
 
-        this.$hero_image.css({
-            "background-image": `url(${hero.avatar})`,
-            "background-size": "cover",
-            "background-position": "center"
-        });
+    this.$hero_image.css({
+        "background-image": `url(${hero.avatar})`,
+        "background-size": "cover",
+        "background-position": "center"
+    });
 
-        this.$hero_name.text(hero.name);
+    this.$hero_name.text(hero.name);
 
-        let skills_html = "";
-        for (let skill of hero.skills) {
-            skills_html += `
-                <div class="ac-game-hero-skill">
-                    <div class="ac-game-hero-skill-name">${skill.name}</div>
+    let skills_html = "";
+    for (let skill of hero.skills) {
+        skills_html += `
+            <div class="ac-game-hero-skill">
+                <img src="${skill.icon}" class="ac-game-hero-skill-icon">
+                <div class="ac-game-hero-skill-info">
+                    <div class="ac-game-hero-skill-name">${skill.key} - ${skill.name}</div>
                     <div class="ac-game-hero-skill-desc">${skill.desc}</div>
                 </div>
-            `;
-        }
-        this.$skills_container.html(skills_html);
+            </div>
+        `;
     }
+    this.$skills_container.html(skills_html);
+}
 
     add_listening_events() {
         let outer = this;
